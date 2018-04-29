@@ -160,32 +160,69 @@ void selection_sort_rec(mint *arr, midx n){
 
 sort_test(selection_sort_rec, 10000, 788498);
 
+#ifdef QUICK_SORT_VISUAL
+
 #include <stdio.h>
+
+static void quick_sort_print(mint *arr, midx n, midx i, midx j, midx pivot){
+    printf(" ");
+    for(midx k = 0; k < n;k++){
+        if(k == i)
+            printf(ANSI_FONT_BOLD ANSI_COLOR_BLUE);
+        else if(k == j)
+            printf(ANSI_FONT_BOLD ANSI_COLOR_GREEN);
+        else if(k == pivot)
+            printf(ANSI_FONT_BOLD ANSI_COLOR_YELLOW);
+        printf("%" PRIint "  " ANSI_COLOR_RESET, arr[k]);
+    }
+}
+
+#endif
 
 static midx quick_sort_partition(mint *arr, midx m, midx n, midx total){
     mint pivot = arr[m];
     midx i = m;
     midx j = n + 1;
-    //dbg(" i : %" PRIidx " j : %" PRIidx, i, j);
-    //fflush(stdout);
+#ifdef QUICK_SORT_VISUAL
+    dbg("Initially   : ");
+    quick_sort_print(arr, total, i, j, m);
+#endif
     do{
-        //dbg("Checking i");
-        //fflush(stdout);
+#ifdef QUICK_SORT_VISUAL
+        dbg("Start itn.  : ");
+        quick_sort_print(arr, total, i, j, m);
+#endif
         do{
             i++;
-            //dbg(" i : %" PRIidx, i);
-            //fflush(stdout);
+#ifdef QUICK_SORT_VISUAL
+            dbg("Increment i : ");
+            quick_sort_print(arr, total, i, j, m);
+#endif
         } while(i < total-1 && arr[i] < pivot);
-        //dbg("Checking j");
         do{
             j--;
-            //dbg(" j : %" PRIidx, j);
-            //fflush(stdout);
+#ifdef QUICK_SORT_VISUAL
+            dbg("Decrement j : ");
+            quick_sort_print(arr, total, i, j, m);
+#endif
         } while(arr[j] > pivot);
-        if(i < j)
+        if(i < j){
             swap(&arr[i], &arr[j]);
+#ifdef QUICK_SORT_VISUAL
+            dbg("Do swap i-j : ");
+            quick_sort_print(arr, total, i, j, m);
+#endif
+        }
+#ifdef QUICK_SORT_VISUAL
+        printf("\n");
+#endif
     } while(i < j);
     swap(&arr[m], &arr[j]);
+#ifdef QUICK_SORT_VISUAL
+    dbg("Do swap p-j : ");
+    quick_sort_print(arr, total, i, j, m);
+    printf("\n");
+#endif
     return j;
 }
 
@@ -198,10 +235,20 @@ void quick_sort2(mint *arr, midx m, midx n, midx total){
 }
 
 void quick_sort(mint *arr, midx n){
+#ifdef QUICK_SORT_VISUAL
+    dbg("QuickSorting...");
+#endif
     quick_sort2(arr, 0, n - 1, n);
+#ifdef QUICK_SORT_VISUAL
+    dbg("\n");
+#endif
 }
 
-sort_test(quick_sort, 10000, 8958);
+#ifdef QUICK_SORT_VISUAL
+sort_test(quick_sort, 20, 10);
+#else
+sort_test(quick_sort, 10000, 89893);
+#endif
 
 void quick_sort_nonrec(mint *arr, midx n){
     Stack start = stack_new(n/2 + 1);
@@ -226,10 +273,13 @@ void quick_sort_nonrec(mint *arr, midx n){
     stack_free(stop);
 }
 
-sort_test(quick_sort_nonrec, 10000, 56885);
+#ifdef QUICK_SORT_VISUAL
+sort_test(quick_sort_nonrec, 20, 10);
+#else
+sort_test(quick_sort_nonrec, 10000, 87487);
+#endif
 
 void test_sort(){
-    //*
     TEST("Bubble Sort", test_bubble_sort());
     TEST("Bubble Sort Recursive", test_bubble_sort_rec());
     TEST("Bubble Sort Advanced", test_bubble_sort_adv());
@@ -237,7 +287,6 @@ void test_sort(){
     TEST("Insertion Sort Recursive", test_insertion_sort_rec());
     TEST("Selection Sort", test_selection_sort());
     TEST("Selection Sort Recursive", test_selection_sort_rec());
-    //*/
     TEST("Quick Sort", test_quick_sort());
     TEST("Quick Sort Nonrecursive", test_quick_sort_nonrec());
 }
