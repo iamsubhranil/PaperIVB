@@ -68,8 +68,7 @@ static mint test_stack_grow(Stack_Intr *stack){
     if(*(stack->top - 1) == 9999){
         ret = 1;
     }
-    for(mint i = 0;i < 10000;i++)
-        stack_pop(stack);
+    stack->top -= 10000;
     return ret;
 }
 
