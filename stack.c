@@ -3,19 +3,20 @@
 #include "stack.h"
 #include "test.h"
 
-
 Stack_Intr* stack_new(midx count){
     Stack_Intr *stack = (Stack_Intr*)malloc(sizeof(Stack_Intr));
-    stack->count = count ? count : 1;
-    stack->values = (mint *)malloc(sizeof(mint) * count);
+    stack->count = count > 0 ? count : 0;
+    stack->values = count == 0 ? NULL : (mint *)malloc(sizeof(mint) * count);
     stack->top = stack->values;
     return stack;
 }
 
 void stack_push(Stack_Intr *stack, mint value){
-    if(stack->top == stack->values + (sizeof(mint) * stack->count)){
-        stack->count *= 2;
+    if(stack->top == NULL || stack->top == stack->values + stack->count - 1){
+        mint oldCount = stack->count;
+        (stack->count == 0) ? (stack->count = 1) : (stack->count *= 2);
         stack->values = (mint *)realloc(stack->values, sizeof(mint) * stack->count);
+        stack->top = stack->values + (oldCount == 0 ? 0 :oldCount - 1);
     }
     *(stack->top) = value;
     stack->top++;
@@ -60,6 +61,18 @@ static mint test_stack_push(Stack_Intr *stack){
     return 1;
 }
 
+static mint test_stack_grow(Stack_Intr *stack){
+    for(mint i = 0;i < 10000;i++)
+        stack_push(stack, i);
+    mint ret = 0;
+    if(*(stack->top - 1) == 9999){
+        ret = 1;
+    }
+    for(mint i = 0;i < 10000;i++)
+        stack_pop(stack);
+    return ret;
+}
+
 static mint test_stack_pop(Stack_Intr *stack){
     stack_push(stack, 372);
     if(stack_pop(stack) != 372)
@@ -82,6 +95,8 @@ void test_stack(){
     TEST("Stack Creation", test_stack_new(10));
     Stack stack = stack_new(10);
     TEST("Stack Push", test_stack_push(stack));
+    TEST("Stack Grow", test_stack_grow(stack));
     TEST("Stack Pop", test_stack_pop(stack));
     TEST("Stack Empty", test_stack_empty(stack));
+    stack_free(stack);
 }
