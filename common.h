@@ -12,3 +12,6 @@ typedef int64_t mint;
 typedef int64_t midx;
 #define PRIidx PRId64
 #define SCNidx SCNd64
+
+#define SORT_TEST_ITEM_COUNT 10000 // denotes the number of samples in each sort test
+//#define QUICK_SORT_VISUAL // toggles the visualization of the quick sort algorithm

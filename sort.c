@@ -58,7 +58,7 @@ void bubble_sort(mint *arr, midx n){
     }
 }
 
-sort_test(bubble_sort, 10000, 372);
+sort_test(bubble_sort, SORT_TEST_ITEM_COUNT, 372);
 
 static void bubble_sort_rec2(mint *arr, midx pass, midx n){
     if(pass == n)
@@ -75,7 +75,7 @@ void bubble_sort_rec(mint *arr, midx n){
     bubble_sort_rec2(arr, 0, n);
 }
 
-sort_test(bubble_sort_rec, 10000, 483);
+sort_test(bubble_sort_rec, SORT_TEST_ITEM_COUNT, 483);
 
 void bubble_sort_adv(mint *arr, midx n){
     for(midx pass = 0;pass < n;pass++){
@@ -91,7 +91,7 @@ void bubble_sort_adv(mint *arr, midx n){
     }
 }
 
-sort_test(bubble_sort_adv, 10000, 281);
+sort_test(bubble_sort_adv, SORT_TEST_ITEM_COUNT, 281);
 
 void insertion_sort(mint *arr, midx n){
     for(midx i = 0; i < n; i++){
@@ -105,7 +105,7 @@ void insertion_sort(mint *arr, midx n){
     }
 }
 
-sort_test(insertion_sort, 10000, 3478387);
+sort_test(insertion_sort, SORT_TEST_ITEM_COUNT, 3478387);
 
 static void insertion_sort_rec2(mint *arr, midx i, midx n){
     if(i == n)
@@ -124,7 +124,7 @@ void insertion_sort_rec(mint *arr, midx n){
     insertion_sort_rec2(arr, 0, n);
 }
 
-sort_test(insertion_sort_rec, 10000, 38892);
+sort_test(insertion_sort_rec, SORT_TEST_ITEM_COUNT, 38892);
 
 void selection_sort(mint *arr, midx n){
     for(midx i = 0;i < n;i++){
@@ -139,7 +139,7 @@ void selection_sort(mint *arr, midx n){
     }
 }
 
-sort_test(selection_sort, 10000, 58931);
+sort_test(selection_sort, SORT_TEST_ITEM_COUNT, 58931);
 
 static void selection_sort_rec2(mint *arr, midx i, midx n){
     if(i == n)
@@ -158,7 +158,7 @@ void selection_sort_rec(mint *arr, midx n){
     selection_sort_rec2(arr, 0, n);
 }
 
-sort_test(selection_sort_rec, 10000, 788498);
+sort_test(selection_sort_rec, SORT_TEST_ITEM_COUNT, 788498);
 
 #ifdef QUICK_SORT_VISUAL
 
@@ -247,7 +247,7 @@ void quick_sort(mint *arr, midx n){
 #ifdef QUICK_SORT_VISUAL
 sort_test(quick_sort, 20, 10);
 #else
-sort_test(quick_sort, 10000, 89893);
+sort_test(quick_sort, SORT_TEST_ITEM_COUNT, 89893);
 #endif
 
 void quick_sort_nonrec(mint *arr, midx n){
@@ -276,7 +276,7 @@ void quick_sort_nonrec(mint *arr, midx n){
 #ifdef QUICK_SORT_VISUAL
 sort_test(quick_sort_nonrec, 20, 10);
 #else
-sort_test(quick_sort_nonrec, 10000, 87487);
+sort_test(quick_sort_nonrec, SORT_TEST_ITEM_COUNT, 87487);
 #endif
 
 void test_sort(){
