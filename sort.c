@@ -312,7 +312,7 @@ static void sorted_merge(mint *arr, midx l, midx m, midx u, mint *aux){
         aux[pointer] = arr[mid];
         mid++; pointer++;
     }
-    for(midx i = 0;i <= pointer;i++)
+    for(midx i = 0;i < pointer;i++)
         arr[i + l] = aux[i];
 }
 
