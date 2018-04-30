@@ -17,27 +17,39 @@ static mint check_sort(mint *arr, midx n){
 #define sort_test(name, sz, customrange) \
     mint test_##name(){ \
         mint size = sz; \
+        tst_pause("Creating array"); \
         mint *arr = arr_new(size); \
+        tst_pause("Generating random input : Best Case"); \
         arr_fill_rand(arr, size, size, SAMPLE_CASE_BEST); \
+        tst_resume(); \
         name(arr, size); \
+        tst_pause("Checking result"); \
         if(!check_sort(arr, size)){ \
             goto _test_fail_##name; \
         } \
+        tst_pause("Generating random input : Worst Case"); \
         arr_fill_rand(arr, size, -size, SAMPLE_CASE_WORST); \
+        tst_resume(); \
         name(arr, size); \
+        tst_pause("Checking result"); \
         if(!check_sort(arr, size)){ \
             goto _test_fail_##name; \
         } \
+        tst_pause("Generating random input : Average Case"); \
         arr_fill_rand(arr, size, customrange, SAMPLE_CASE_AVERAGE); \
+        tst_resume(); \
         name(arr, size); \
+        tst_pause("Checking result"); \
         if(!check_sort(arr, size)) { \
             goto _test_fail_##name; \
         } \
         goto _test_done_##name; \
         _test_fail_##name: \
+        tst_resume(); \
         free(arr); \
         return 0; \
         _test_done_##name: \
+        tst_resume(); \
         free(arr); \
         return 1; \
     }
