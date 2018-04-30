@@ -265,20 +265,20 @@ sort_test(quick_sort, SORT_TEST_ITEM_COUNT, 89893);
 void quick_sort_nonrec(mint *arr, midx n){
     Stack start = stack_new(n/2 + 1, 0);
     Stack stop = stack_new(n/2 + 1, 0);
-    stack_push(start, 0);
-    stack_push(stop, n - 1);
+    stack_push_fast(start, 0);
+    stack_push_fast(stop, n - 1);
     midx total = n;
     while(!stack_is_empty(start)){
-        midx m = stack_pop(start);
-        n = stack_pop(stop);
+        midx m = stack_pop_fast(start);
+        n = stack_pop_fast(stop);
         midx j = quick_sort_partition(arr, m, n, total);
         if(m < j - 1){
-            stack_push(start, m);
-            stack_push(stop, j - 1);
+            stack_push_fast(start, m);
+            stack_push_fast(stop, j - 1);
         }
         if(j + 1 < n){
-            stack_push(start, j + 1);
-            stack_push(stop, n);
+            stack_push_fast(start, j + 1);
+            stack_push_fast(stop, n);
         }
     }
     stack_free(start);
