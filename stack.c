@@ -3,16 +3,27 @@
 #include "stack.h"
 #include "test.h"
 
-Stack_Intr* stack_new(midx count){
+Stack_Intr* stack_new(midx count, mints grow){
     Stack_Intr *stack = (Stack_Intr*)malloc(sizeof(Stack_Intr));
     stack->count = count > 0 ? count : 0;
     stack->values = count == 0 ? NULL : (mint *)malloc(sizeof(mint) * count);
     stack->top = stack->values;
+    stack->grow = grow ? 1 : 0;
+    stack->status = 0;
     return stack;
+}
+
+void stack_push_fast(Stack_Intr *stack, mint value){
+    *(stack->top) = value;
+    stack->top++;
 }
 
 void stack_push(Stack_Intr *stack, mint value){
     if(stack->top == NULL || stack->top == stack->values + stack->count - 1){
+        if(!stack->grow){
+            stack->status |= 1;
+            return;
+        }
         mint oldCount = stack->count;
         (stack->count == 0) ? (stack->count = 1) : (stack->count *= 2);
         stack->values = (mint *)realloc(stack->values, sizeof(mint) * stack->count);
@@ -20,9 +31,21 @@ void stack_push(Stack_Intr *stack, mint value){
     }
     *(stack->top) = value;
     stack->top++;
+    if(stack->status & 2)
+        stack->status = 0;
+}
+
+mint stack_pop_fast(Stack_Intr *stack){
+    return *(--stack->top);
 }
 
 mint stack_pop(Stack_Intr *stack){
+    if(stack->top == stack->values){
+        stack->status |= 2;
+        return 0;
+    }
+    if(stack->status & 1)
+        stack->status = 0;
     return *(--stack->top);
 }
 
@@ -33,15 +56,23 @@ void stack_free(Stack_Intr *stack){
     free(stack);
 }
 
-mint stack_empty(Stack_Intr *stack){
+mint stack_is_empty(Stack_Intr *stack){
     return stack->top == stack->values;
+}
+
+mint stack_is_overflow(Stack_Intr *stack){
+    return stack->status & 1;
+}
+
+mint stack_is_underflow(Stack_Intr *stack){
+    return stack->status & 2;
 }
 
 // Tests
 // =========================
 
 static mint test_stack_new(midx count){
-    Stack_Intr* s = stack_new(count);
+    Stack_Intr* s = stack_new(count, 0);
     if(s->count == count && s->values != NULL){
         stack_free(s);
         return 1;
@@ -84,18 +115,36 @@ static mint test_stack_pop(Stack_Intr *stack){
 
 static mint test_stack_empty(Stack_Intr *stack){
     stack_push(stack, 3832);
-    if(stack_empty(stack))
+    if(stack_is_empty(stack))
         return 0;
     stack_pop(stack);
-    return stack_empty(stack);
+    return stack_is_empty(stack);
+}
+
+#include "display.h"
+
+static mint test_stack_overflow(Stack_Intr *stack){
+    for(mint i = 0;i < 12;i++)
+        stack_push(stack, 100);
+    return stack_is_overflow(stack);
+}
+
+static mint test_stack_underflow(Stack_Intr *stack){
+    for(mint i = 0;i < 12;i++)
+        stack_pop(stack);
+    return stack_is_underflow(stack);
 }
 
 void test_stack(){
     TEST("Stack Creation", test_stack_new(10));
-    Stack stack = stack_new(10);
+    Stack stack = stack_new(10, 1);
+    Stack stack2 = stack_new(10, 0);
     TEST("Stack Push", test_stack_push(stack));
+    TEST("Stack Overflow", test_stack_overflow(stack2));
     TEST("Stack Grow", test_stack_grow(stack));
     TEST("Stack Pop", test_stack_pop(stack));
+    TEST("Stack Underflow", test_stack_underflow(stack2));
     TEST("Stack Empty", test_stack_empty(stack));
     stack_free(stack);
+    stack_free(stack2);
 }

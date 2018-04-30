@@ -6,14 +6,43 @@ typedef struct{
     mint *values;
     mint *top;
     midx count;
+    mints grow;
+    mints status; // 0-> Normal, 1-> Overflow, 2-> Underflow, 3-> Overflow and Underflow
 } Stack_Intr;
 
 typedef Stack_Intr* Stack;
 
-Stack stack_new(midx count);
-void stack_push(Stack stack, mint value);
-mint stack_pop(Stack stack);
+// `grow` indicates whether the stack is
+// permitted to grow dynamically at runtime.
+// If `grow` is false, then when an overflow
+// occurs, nothing will be pushed to the stack
+// and the overflow flag will be set.
+Stack stack_new(midx count, mints grow);
+
 void stack_free(Stack stack);
-mint stack_empty(Stack stack);
+
+// No overflow check and/or stack expansion,
+// use only when 200% sure about the state
+// of the stack at runtime, otherwise bad
+// things may happen, heap corruption being
+// the minimum.
+void stack_push_fast(Stack stack, mint value);
+
+// Slower, safer push, with full overflow check
+// and stack expansion support.
+void stack_push(Stack stack, mint value);
+
+// No underflow check, same cautions applicable
+// as stack_push_fast
+mint stack_pop_fast(Stack stack);
+
+// Slower, safer pop, with full underflow check
+mint stack_pop(Stack stack);
+
+
+// Stack status query
+mint stack_is_empty(Stack stack);
+mint stack_is_overflow(Stack stack);
+mint stack_is_underflow(Stack stack);
 
 void test_stack();

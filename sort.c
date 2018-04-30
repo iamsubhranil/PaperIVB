@@ -263,12 +263,12 @@ sort_test(quick_sort, SORT_TEST_ITEM_COUNT, 89893);
 #endif
 
 void quick_sort_nonrec(mint *arr, midx n){
-    Stack start = stack_new(n/2 + 1);
-    Stack stop = stack_new(n/2 + 1);
+    Stack start = stack_new(n/2 + 1, 0);
+    Stack stop = stack_new(n/2 + 1, 0);
     stack_push(start, 0);
     stack_push(stop, n - 1);
     midx total = n;
-    while(!stack_empty(start)){
+    while(!stack_is_empty(start)){
         midx m = stack_pop(start);
         n = stack_pop(stop);
         midx j = quick_sort_partition(arr, m, n, total);
