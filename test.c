@@ -53,10 +53,10 @@ void tst_fail(){
         end = clock();
     line_clear();
     pred( ANSI_FONT_BOLD "\r[Failed] " ANSI_COLOR_RESET);
-    printf(ANSI_FONT_BOLD "%-30s" ANSI_COLOR_RESET " : %fs", testName[0], time_diff());
+    printf(ANSI_FONT_BOLD "%-30s" ANSI_COLOR_RESET "   %fs", testName[0], time_diff());
     fflush(stdout);
     elapsed = 0;
-    start = end = 0;
+    start = end = 1;
 }
 
 void tst_pause(const char *reason){
