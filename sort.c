@@ -21,7 +21,7 @@ static mint check_sort(mint *arr, midx n){
         mint *arr = arr_new(size); \
         tst_pause("Generating random input : Best Case"); \
         arr_fill_rand(arr, size, size, SAMPLE_CASE_BEST); \
-        tst_resume(); \
+        tst_resume("Best Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
         if(!check_sort(arr, size)){ \
@@ -29,7 +29,7 @@ static mint check_sort(mint *arr, midx n){
         } \
         tst_pause("Generating random input : Worst Case"); \
         arr_fill_rand(arr, size, -size, SAMPLE_CASE_WORST); \
-        tst_resume(); \
+        tst_resume("Worst Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
         if(!check_sort(arr, size)){ \
@@ -37,7 +37,7 @@ static mint check_sort(mint *arr, midx n){
         } \
         tst_pause("Generating random input : Average Case"); \
         arr_fill_rand(arr, size, customrange, SAMPLE_CASE_AVERAGE); \
-        tst_resume(); \
+        tst_resume("Average Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
         if(!check_sort(arr, size)) { \
@@ -45,11 +45,11 @@ static mint check_sort(mint *arr, midx n){
         } \
         goto _test_done_##name; \
         _test_fail_##name: \
-        tst_resume(); \
+        tst_resume("Cleanup"); \
         free(arr); \
         return 0; \
         _test_done_##name: \
-        tst_resume(); \
+        tst_resume("Cleanup"); \
         free(arr); \
         return 1; \
     }
