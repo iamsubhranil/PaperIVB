@@ -7,7 +7,7 @@ typedef struct{
     mint *top;
     midx count;
     mints grow;
-    mints status; // 0-> Normal, 1-> Overflow, 2-> Underflow, 3-> Overflow and Underflow
+    mints status; // 0-> Normal, 1-> Overflow, 2-> Underflow
 } Stack_Intr;
 
 typedef Stack_Intr* Stack;

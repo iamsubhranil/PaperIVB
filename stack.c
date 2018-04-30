@@ -121,8 +121,6 @@ static mint test_stack_empty(Stack_Intr *stack){
     return stack_is_empty(stack);
 }
 
-#include "display.h"
-
 static mint test_stack_overflow(Stack_Intr *stack){
     for(mint i = 0;i < 12;i++)
         stack_push(stack, 100);
