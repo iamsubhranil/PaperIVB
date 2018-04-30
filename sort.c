@@ -279,6 +279,48 @@ sort_test(quick_sort_nonrec, 20, 10);
 sort_test(quick_sort_nonrec, SORT_TEST_ITEM_COUNT, 87487);
 #endif
 
+static void sorted_merge(mint *arr, midx l, midx m, midx u, mint *aux){
+    midx pointer = 0, mid = m + 1, low = l;
+    while(low <= m && mid <= u){
+        if(arr[low] > arr[mid]){
+            aux[pointer] = arr[mid];
+            mid++;
+        }
+        else{
+            aux[pointer] = arr[low];
+            low++;
+        }
+        pointer++;
+    }
+    while(low <= m){
+        aux[pointer] = arr[low];
+        low++; pointer++;
+    }
+    while(mid <= u){
+        aux[pointer] = arr[mid];
+        mid++; pointer++;
+    }
+    for(midx i = 0;i <= pointer;i++)
+        arr[i + l] = aux[i];
+}
+
+static void merge_sort2(mint *arr, midx l, midx u, mint *aux){
+    if(l >= u)
+        return;
+    midx m = (l+u)/2;
+    merge_sort2(arr, l, m, aux);
+    merge_sort2(arr, m+1, u, aux);
+    sorted_merge(arr, l, m, u, aux);
+}
+
+void merge_sort(mint *arr, midx n){
+    mint *aux = arr_new(n);
+    merge_sort2(arr, 0, n - 1, aux);
+    arr_free(aux);
+}
+
+sort_test(merge_sort, SORT_TEST_ITEM_COUNT, 84982);
+
 void test_sort(){
     TEST("Bubble Sort", test_bubble_sort());
     TEST("Bubble Sort Recursive", test_bubble_sort_rec());
@@ -289,4 +331,5 @@ void test_sort(){
     TEST("Selection Sort Recursive", test_selection_sort_rec());
     TEST("Quick Sort", test_quick_sort());
     TEST("Quick Sort Nonrecursive", test_quick_sort_nonrec());
+    TEST("Merge Sort", test_merge_sort());
 }
