@@ -333,6 +333,44 @@ void merge_sort(mint *arr, midx n){
 
 sort_test(merge_sort, SORT_TEST_ITEM_COUNT, 84982);
 
+void merge_sort_nonrec(mint *arr, midx n){
+    Stack start = stack_new(n, 0);
+    Stack stop = stack_new(n, 0);
+    Stack beg = stack_new(n, 0);
+    Stack end = stack_new(n, 0);
+    Stack mid = stack_new(n, 0);
+
+    mint *aux = arr_new(n);
+
+    stack_push_fast(start, 0);
+    stack_push_fast(stop, n - 1);
+    while(!stack_is_empty(start)){
+        midx s = stack_pop_fast(start);
+        midx e = stack_pop_fast(stop);
+        midx m = (s + e)/2;
+        stack_push_fast(beg, s); stack_push_fast(end, e); stack_push_fast(mid, m);
+        if(s < m){
+            stack_push_fast(start, s);
+            stack_push_fast(stop, m);
+        }
+        if(m + 1 < e){
+            stack_push_fast(start, m + 1);
+            stack_push_fast(stop, e);
+        }
+    }
+    while(!stack_is_empty(beg)){
+        midx b = stack_pop_fast(beg);
+        midx m = stack_pop_fast(mid);
+        midx e = stack_pop_fast(end);
+        sorted_merge(arr, b, m, e, aux);
+    }
+    arr_free(aux);
+    stack_free(start); stack_free(stop);
+    stack_free(beg); stack_free(mid); stack_free(end);
+}
+
+sort_test(merge_sort_nonrec, SORT_TEST_ITEM_COUNT, 986798);
+
 void test_sort(){
     TEST("Bubble Sort", test_bubble_sort());
     TEST("Bubble Sort Recursive", test_bubble_sort_rec());
@@ -344,4 +382,5 @@ void test_sort(){
     TEST("Quick Sort", test_quick_sort());
     TEST("Quick Sort Nonrecursive", test_quick_sort_nonrec());
     TEST("Merge Sort", test_merge_sort());
+    TEST("Merge Sort Nonrecursive", test_merge_sort_nonrec());
 }
