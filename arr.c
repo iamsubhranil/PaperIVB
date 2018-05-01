@@ -77,6 +77,18 @@ reinput:
     return arr;
 }
 
+void arr_print(mint *arr, midx n){
+    printf("{ ");
+    if(n == 0){
+        printf("Empty }");
+        return;
+    }
+    printf("%" PRIint, arr[0]);
+    for(midx i = 1;i < n;i++)
+        printf(", %" PRIint, arr[i]);
+    printf(" }");
+}
+
 static mint test_arr_fill(mint *arr){
     arr_fill_int(arr, 2, 2, 3);
     if(arr[1] != 3){

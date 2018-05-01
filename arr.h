@@ -28,5 +28,6 @@ typedef enum{
 void arr_fill_rand(mint *arr, midx count, mint range, SampleCase scase);
 
 mint* arr_create();
+void arr_print(mint *arr, midx n);
 
 void test_arr();
