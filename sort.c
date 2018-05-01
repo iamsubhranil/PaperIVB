@@ -36,7 +36,7 @@ static mint check_sort(mint *arr, midx n){
             goto _test_fail_##name; \
         } \
         tst_pause("Generating random input : Average Case"); \
-        arr_fill_rand(arr, size, customrange, SAMPLE_CASE_AVERAGE); \
+        arr_fill_rand(arr, size, random_at_most(customrange), SAMPLE_CASE_AVERAGE); \
         tst_resume("Average Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
