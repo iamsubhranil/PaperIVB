@@ -145,10 +145,14 @@ static mint test_random_at_most(){
 }
 
 static mint test_arr_copy(mint *source, midx n){
+    arr_fill_rand(source, 10, 100, SAMPLE_CASE_AVERAGE);
     mint *dest = arr_copy(source, n);
     for(midx i = 0;i < n;i++)
-        if(source[i] != dest[i])
+        if(source[i] != dest[i]){
+            arr_free(dest);
             return 0;
+        }
+    arr_free(dest);
     return 1;
 }
 
