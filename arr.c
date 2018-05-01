@@ -31,15 +31,36 @@ void arr_fill_int(mint *arr, midx count, ...){
     va_end(list);
 }
 
+// Assumes 0 <= max <= RAND_MAX
+// Returns in the closed interval [0, max]
+mint random_at_most(mint max) {
+  mint
+    // max <= RAND_MAX < ULONG_MAX, so this is okay.
+    num_bins = max + 1,
+    num_rand = (mint) RAND_MAX + 1,
+    bin_size = num_rand / num_bins,
+    defect   = num_rand % num_bins;
+
+  mint x;
+  do {
+   x = random();
+  }
+  // This is carefully written not to overflow
+  while (num_rand - defect <= (mint)x);
+
+  // Truncated division is intentional
+  return x/bin_size;
+}
+
 void arr_fill_rand(mint *arr, midx count, mint range, SampleCase scase){
     srand(time(NULL));
-    mint start = random() % range;
+    mint start = random_at_most(range);
     while((scase == SAMPLE_CASE_BEST && MINT_MAX - start < count)
             || (scase == SAMPLE_CASE_WORST && MINT_MAX + start < count))
-        start = random() % range;
+        start = random_at_most(range);
     
     for(midx i = 0;i < count;i++){
-        arr[i] = scase == SAMPLE_CASE_AVERAGE ? random() % range 
+        arr[i] = scase == SAMPLE_CASE_AVERAGE ? random_at_most(range) 
                 : scase == SAMPLE_CASE_BEST ? start++
                 : start--;
     }
@@ -104,9 +125,22 @@ static mint test_arr_fill(mint *arr){
     return 1;
 }
 
+static mint test_random_at_most(){
+    for(mint i = 0;i < 1000;i++)
+        if(random_at_most(100) > 100)
+            return 0;
+    for(mint i = 0;i < random_at_most(1000);i++){
+        mint range = random_at_most(93828);
+        if(random_at_most(range) > range)
+            return 0;
+    }
+    return 1;
+}
+
 void test_arr(){
     mint *arr = arr_new(10);
     TEST("Array Create", arr);
     TEST("Array Fill", test_arr_fill(arr));
     arr_free(arr);
+    TEST("Random In Range", test_random_at_most());
 }
