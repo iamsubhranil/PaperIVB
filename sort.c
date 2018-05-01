@@ -371,6 +371,65 @@ void merge_sort_nonrec(mint *arr, midx n){
 
 sort_test(merge_sort_nonrec, SORT_TEST_ITEM_COUNT, 986798);
 
+static mint* heap_create(mint *arr, midx n){
+    mint *heap = arr_new(n);
+    for(midx i = 0;i < n;i++){
+        heap[i] = arr[i];
+        midx j = i;
+        while(j > 0){
+            midx parent = (j+1)/2 - 1;
+            // Min heap
+            if(heap[j] < heap[parent]){
+                swap(&heap[j], &heap[parent]);
+                j = parent;
+                continue;
+            }
+            break;
+        }
+    }
+    return heap;
+}
+
+static void heap_rebuild(mint *arr, midx n){
+    if(n == 1)
+        return;
+    midx j = 0;
+    while(1){
+        midx leftChild = (j * 2) + 1, rightChild = (j * 2) + 2;
+        midx nextCheck = j;
+        mint *min = &arr[j];
+        if(leftChild < n && arr[leftChild] < *min){
+            min = &arr[leftChild];
+            nextCheck = leftChild;
+        }
+        if(rightChild < n && arr[rightChild] < *min){
+            min = &arr[rightChild];
+            nextCheck = rightChild;
+        }
+        if(*min != arr[j]){
+            swap(min, &arr[j]);
+            j = nextCheck;
+            continue;
+        }
+        break;
+    }
+}
+
+void heap_sort(mint *arr, midx n){
+    tst_pause("Creating heap");
+    mint *heap = heap_create(arr, n);
+    tst_resume(NULL);
+    for(midx i = n, j = 0;i > 0;i--,j++){
+        arr[j] = heap[0];
+        heap[0] = heap[i - 1];
+        heap_rebuild(heap, i - 1);
+    }
+    arr[n - 1] = heap[0];
+    arr_free(heap);
+}
+
+sort_test(heap_sort, SORT_TEST_ITEM_COUNT, 985893);
+
 void test_sort(){
     TEST("Bubble Sort", test_bubble_sort());
     TEST("Bubble Sort Recursive", test_bubble_sort_rec());
@@ -383,4 +442,5 @@ void test_sort(){
     TEST("Quick Sort Nonrecursive", test_quick_sort_nonrec());
     TEST("Merge Sort", test_merge_sort());
     TEST("Merge Sort Nonrecursive", test_merge_sort_nonrec());
+    TEST("Heap Sort", test_heap_sort());
 }
