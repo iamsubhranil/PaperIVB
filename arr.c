@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 #include "arr.h"
 #include "display.h"
@@ -110,6 +111,12 @@ void arr_print(mint *arr, midx n){
     printf(" }");
 }
 
+mint* arr_copy(mint *source, midx n){
+    mint *dest = arr_new(n);
+    memcpy(dest, source, sizeof(mint) * n);
+    return dest;
+}
+
 static mint test_arr_fill(mint *arr){
     arr_fill_int(arr, 2, 2, 3);
     if(arr[1] != 3){
@@ -137,10 +144,19 @@ static mint test_random_at_most(){
     return 1;
 }
 
+static mint test_arr_copy(mint *source, midx n){
+    mint *dest = arr_copy(source, n);
+    for(midx i = 0;i < n;i++)
+        if(source[i] != dest[i])
+            return 0;
+    return 1;
+}
+
 void test_arr(){
     mint *arr = arr_new(10);
     TEST("Array Create", arr);
     TEST("Array Fill", test_arr_fill(arr));
+    TEST("Array Copy", test_arr_copy(arr, 10));
     arr_free(arr);
     TEST("Random In Range", test_random_at_most());
 }

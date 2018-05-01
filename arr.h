@@ -30,5 +30,6 @@ void arr_fill_rand(mint *arr, midx count, mint range, SampleCase scase);
 mint* arr_create();
 void arr_print(mint *arr, midx n);
 mint random_at_most(mint range);
+mint* arr_copy(mint *arr, midx n);
 
 void test_arr();
