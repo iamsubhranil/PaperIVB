@@ -44,5 +44,6 @@ mint stack_pop(Stack stack);
 mint stack_is_empty(Stack stack);
 mint stack_is_overflow(Stack stack);
 mint stack_is_underflow(Stack stack);
+mint stack_size(Stack stack);
 
 void test_stack();

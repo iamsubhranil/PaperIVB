@@ -68,6 +68,10 @@ mint stack_is_underflow(Stack_Intr *stack){
     return stack->status & 2;
 }
 
+mint stack_size(Stack_Intr *stack){
+    return stack->top - stack->values;
+}
+
 // Tests
 // =========================
 
@@ -133,6 +137,17 @@ static mint test_stack_underflow(Stack_Intr *stack){
     return stack_is_underflow(stack);
 }
 
+static mint test_stack_size(Stack_Intr *stack){
+    stack->top = stack->values;
+    mint size = 4389;
+    for(mint i = 0;i < size;i++)
+        stack_push(stack, 3929);
+    if(stack_size(stack) != size)
+        return 0;
+    stack->top = stack->values;
+    return 1;
+}
+
 void test_stack(){
     TEST("Stack Creation", test_stack_new(10));
     Stack stack = stack_new(10, 1);
@@ -142,6 +157,7 @@ void test_stack(){
     TEST("Stack Grow", test_stack_grow(stack));
     TEST("Stack Pop", test_stack_pop(stack));
     TEST("Stack Underflow", test_stack_underflow(stack2));
+    TEST("Stack Size", test_stack_size(stack));
     TEST("Stack Empty", test_stack_empty(stack));
     stack_free(stack);
     stack_free(stack2);
