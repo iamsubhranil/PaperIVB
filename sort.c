@@ -70,7 +70,9 @@ void bubble_sort(mint *arr, midx n){
     }
 }
 
+#ifdef SORT_ENABLE_TEST_BUBBLE
 sort_test(bubble_sort, SORT_TEST_ITEM_COUNT, 372);
+#endif
 
 static void bubble_sort_rec2(mint *arr, midx pass, midx n){
     if(pass == n)
@@ -87,7 +89,9 @@ void bubble_sort_rec(mint *arr, midx n){
     bubble_sort_rec2(arr, 0, n);
 }
 
+#ifdef SORT_ENABLE_TEST_BUBBLE_REC
 sort_test(bubble_sort_rec, SORT_TEST_ITEM_COUNT, 483);
+#endif
 
 void bubble_sort_adv(mint *arr, midx n){
     for(midx pass = 0;pass < n;pass++){
@@ -103,7 +107,9 @@ void bubble_sort_adv(mint *arr, midx n){
     }
 }
 
+#ifdef SORT_ENABLE_TEST_BUBBLE_ADV
 sort_test(bubble_sort_adv, SORT_TEST_ITEM_COUNT, 281);
+#endif
 
 void insertion_sort(mint *arr, midx n){
     for(midx i = 0; i < n; i++){
@@ -117,7 +123,9 @@ void insertion_sort(mint *arr, midx n){
     }
 }
 
+#ifdef SORT_ENABLE_TEST_INSERTION
 sort_test(insertion_sort, SORT_TEST_ITEM_COUNT, 3478387);
+#endif
 
 static void insertion_sort_rec2(mint *arr, midx i, midx n){
     if(i == n)
@@ -136,7 +144,9 @@ void insertion_sort_rec(mint *arr, midx n){
     insertion_sort_rec2(arr, 0, n);
 }
 
+#ifdef SORT_ENABLE_TEST_INSERTION_REC
 sort_test(insertion_sort_rec, SORT_TEST_ITEM_COUNT, 38892);
+#endif
 
 void selection_sort(mint *arr, midx n){
     for(midx i = 0;i < n;i++){
@@ -151,7 +161,9 @@ void selection_sort(mint *arr, midx n){
     }
 }
 
+#ifdef SORT_ENABLE_TEST_SELECTION
 sort_test(selection_sort, SORT_TEST_ITEM_COUNT, 58931);
+#endif
 
 static void selection_sort_rec2(mint *arr, midx i, midx n){
     if(i == n)
@@ -170,7 +182,9 @@ void selection_sort_rec(mint *arr, midx n){
     selection_sort_rec2(arr, 0, n);
 }
 
+#ifdef SORT_ENABLE_TEST_SELECTION_REC
 sort_test(selection_sort_rec, SORT_TEST_ITEM_COUNT, 788498);
+#endif
 
 #ifdef QUICK_SORT_VISUAL
 
@@ -256,10 +270,12 @@ void quick_sort(mint *arr, midx n){
 #endif
 }
 
+#ifdef SORT_ENABLE_TEST_QUICK
 #ifdef QUICK_SORT_VISUAL
 sort_test(quick_sort, 20, 10);
 #else
 sort_test(quick_sort, SORT_TEST_ITEM_COUNT, 89893);
+#endif
 #endif
 
 void quick_sort_nonrec(mint *arr, midx n){
@@ -285,10 +301,12 @@ void quick_sort_nonrec(mint *arr, midx n){
     stack_free(stop);
 }
 
+#ifdef SORT_ENABLE_TEST_QUICK_NONREC
 #ifdef QUICK_SORT_VISUAL
 sort_test(quick_sort_nonrec, 20, 10);
 #else
 sort_test(quick_sort_nonrec, SORT_TEST_ITEM_COUNT, 87487);
+#endif
 #endif
 
 static void sorted_merge(mint *arr, midx l, midx m, midx u, mint *aux){
@@ -331,7 +349,9 @@ void merge_sort(mint *arr, midx n){
     arr_free(aux);
 }
 
+#ifdef SORT_ENABLE_TEST_MERGE
 sort_test(merge_sort, SORT_TEST_ITEM_COUNT, 84982);
+#endif
 
 void merge_sort_nonrec(mint *arr, midx n){
     Stack start = stack_new(n, 0);
@@ -348,7 +368,9 @@ void merge_sort_nonrec(mint *arr, midx n){
         midx s = stack_pop_fast(start);
         midx e = stack_pop_fast(stop);
         midx m = (s + e)/2;
+
         stack_push_fast(beg, s); stack_push_fast(end, e); stack_push_fast(mid, m);
+
         if(s < m){
             stack_push_fast(start, s);
             stack_push_fast(stop, m);
@@ -364,12 +386,15 @@ void merge_sort_nonrec(mint *arr, midx n){
         midx e = stack_pop_fast(end);
         sorted_merge(arr, b, m, e, aux);
     }
+
     arr_free(aux);
     stack_free(start); stack_free(stop);
     stack_free(beg); stack_free(mid); stack_free(end);
 }
 
+#ifdef SORT_ENABLE_TEST_MERGE_NONREC
 sort_test(merge_sort_nonrec, SORT_TEST_ITEM_COUNT, 986798);
+#endif
 
 static mint* heap_create(mint *arr, midx n){
     mint *heap = arr_new(n);
@@ -425,19 +450,45 @@ void heap_sort(mint *arr, midx n){
     arr_free(heap);
 }
 
+#ifdef SORT_ENABLE_TEST_HEAP
 sort_test(heap_sort, SORT_TEST_ITEM_COUNT, 985893);
+#endif
 
 void test_sort(){
+#ifdef SORT_ENABLE_TEST_BUBBLE
     TEST("Bubble Sort", test_bubble_sort());
+#endif
+#ifdef SORT_ENABLE_TEST_BUBBLE_REC
     TEST("Bubble Sort Recursive", test_bubble_sort_rec());
+#endif
+#ifdef SORT_ENABLE_TEST_BUBBLE_ADV
     TEST("Bubble Sort Advanced", test_bubble_sort_adv());
+#endif
+#ifdef SORT_ENABLE_TEST_INSERTION
     TEST("Insertion Sort", test_insertion_sort());
+#endif
+#ifdef SORT_ENABLE_TEST_INSERTION_REC
     TEST("Insertion Sort Recursive", test_insertion_sort_rec());
+#endif
+#ifdef SORT_ENABLE_TEST_SELECTION
     TEST("Selection Sort", test_selection_sort());
+#endif
+#ifdef SORT_ENABLE_TEST_SELECTION_REC
     TEST("Selection Sort Recursive", test_selection_sort_rec());
+#endif
+#ifdef SORT_ENABLE_TEST_QUICK
     TEST("Quick Sort", test_quick_sort());
+#endif
+#ifdef SORT_ENABLE_TEST_QUICK_NONREC
     TEST("Quick Sort Nonrecursive", test_quick_sort_nonrec());
+#endif
+#ifdef SORT_ENABLE_TEST_MERGE
     TEST("Merge Sort", test_merge_sort());
+#endif
+#ifdef SORT_ENABLE_TEST_MERGE_NONREC
     TEST("Merge Sort Nonrecursive", test_merge_sort_nonrec());
+#endif
+#ifdef SORT_ENABLE_TEST_HEAP
     TEST("Heap Sort", test_heap_sort());
+#endif
 }
