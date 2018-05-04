@@ -396,19 +396,16 @@ static void heap_rebuild(mint *arr, midx n){
     midx j = 0;
     while(1){
         midx leftChild = (j * 2) + 1, rightChild = (j * 2) + 2;
-        midx nextCheck = j;
-        mint *min = &arr[j];
-        if(leftChild < n && arr[leftChild] < *min){
-            min = &arr[leftChild];
-            nextCheck = leftChild;
+        midx min = j;
+        if(leftChild < n && arr[leftChild] < arr[min]){
+            min = leftChild;
         }
-        if(rightChild < n && arr[rightChild] < *min){
-            min = &arr[rightChild];
-            nextCheck = rightChild;
+        if(rightChild < n && arr[rightChild] < arr[min]){
+            min = rightChild;
         }
-        if(*min != arr[j]){
-            swap(min, &arr[j]);
-            j = nextCheck;
+        if(min != j){
+            swap(&arr[min], &arr[j]);
+            j = min;
             continue;
         }
         break;
