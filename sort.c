@@ -438,9 +438,7 @@ static void heap_rebuild(mint *arr, midx n){
 }
 
 void heap_sort(mint *arr, midx n){
-    tst_pause("Creating heap");
     mint *heap = heap_create(arr, n);
-    tst_resume(NULL);
     for(midx i = n, j = 0;i > 0;i--,j++){
         arr[j] = heap[0];
         heap[0] = heap[i - 1];
