@@ -26,7 +26,13 @@ void stack_free(Stack stack);
 // of the stack at runtime, otherwise bad
 // things may happen, heap corruption being
 // the minimum.
-void stack_push_fast(Stack stack, mint value);
+void stack_push_fast2(Stack stack, mint value);
+
+#define stack_push_fast(stack, value) \
+    do{ \
+        *((Stack_Intr*)stack)->top = value; \
+        ((Stack_Intr*)stack)->top++; \
+    } while(0)
 
 // Slower, safer push, with full overflow check
 // and stack expansion support.
@@ -34,7 +40,9 @@ void stack_push(Stack stack, mint value);
 
 // No underflow check, same cautions applicable
 // as stack_push_fast
-mint stack_pop_fast(Stack stack);
+mint stack_pop_fast2(Stack stack);
+
+#define stack_pop_fast(stack) (*(--((Stack_Intr*)stack)->top))
 
 // Slower, safer pop, with full underflow check
 mint stack_pop(Stack stack);

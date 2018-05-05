@@ -13,7 +13,7 @@ Stack_Intr* stack_new(midx count, mints grow){
     return stack;
 }
 
-void stack_push_fast(Stack_Intr *stack, mint value){
+void stack_push_fast2(Stack_Intr *stack, mint value){
     *(stack->top) = value;
     stack->top++;
 }
@@ -35,7 +35,7 @@ void stack_push(Stack_Intr *stack, mint value){
         stack->status = 0;
 }
 
-mint stack_pop_fast(Stack_Intr *stack){
+mint stack_pop_fast2(Stack_Intr *stack){
     return *(--stack->top);
 }
 
