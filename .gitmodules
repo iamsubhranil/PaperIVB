@@ -1,0 +1,3 @@
+[submodule "histo"]
+	path = histo
+	url = https://github.com/iamsubhranil/histo
