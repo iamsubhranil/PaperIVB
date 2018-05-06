@@ -30,7 +30,7 @@ void test_sort();
 #define SORT_TEST_ITEM_COUNT 10000 // denotes the number of samples in each sort test
 #endif
 
-//#define QUICK_SORT_VISUAL // toggles the visualization of the quick sort algorithm
+//#define SORT_ENABLE_VISUAL // toggles the visualization of all algorithms
 
 #ifdef SORT_ENABLE_TEST_ALL
 #define SORT_ENABLE_TEST_BUBBLE

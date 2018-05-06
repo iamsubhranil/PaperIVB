@@ -4,6 +4,12 @@
 #include "display.h"
 #include "stack.h"
 
+#ifdef SORT_ENABLE_VISUAL
+
+#include "histogram.h"
+
+#endif
+
 static mint check_sort(mint *arr, midx n){
     for(midx i = 0;i < n-1;i++){
         if(arr[i] > arr[i+1]){
@@ -14,7 +20,7 @@ static mint check_sort(mint *arr, midx n){
     return 1;
 }
 
-#define sort_test(name, sz, customrange) \
+#define sort_test2(name, sz, customrange) \
     mint test_##name(){ \
         mint size = sz; \
         tst_pause("Creating array"); \
@@ -36,7 +42,7 @@ static mint check_sort(mint *arr, midx n){
             goto _test_fail_##name; \
         } \
         tst_pause("Generating random input : Average Case"); \
-        arr_fill_rand(arr, size, random_at_most(customrange), SAMPLE_CASE_AVERAGE); \
+        arr_fill_rand(arr, size, customrange, SAMPLE_CASE_AVERAGE); \
         tst_resume("Average Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
@@ -54,6 +60,12 @@ static mint check_sort(mint *arr, midx n){
         return 1; \
     }
 
+#ifdef SORT_ENABLE_VISUAL
+#define sort_test(name, sz, customrange) sort_test2(name, 20, 100)
+#else
+#define sort_test(name, sz, customrange) sort_test2(name, sz, customrange)
+#endif
+
 static void swap(mint *p1, mint *p2){
     mint p3 = *p1;
     *p1 = *p2;
@@ -61,13 +73,22 @@ static void swap(mint *p1, mint *p2){
 }
 
 void bubble_sort(mint *arr, midx n){
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Bubble Sort");
+#endif
     for(midx pass = 0;pass < n;pass++){
         for(midx i = 0;i < n-pass-1;i++){
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 2, pass, ANSI_COLOR_BLUE, i, ANSI_COLOR_GREEN);
+#endif
             if(arr[i] > arr[i+1]){
                 swap(&arr[i], &arr[i+1]);
             }
         }
     }
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 0);
+#endif
 }
 
 #ifdef SORT_ENABLE_TEST_BUBBLE
@@ -78,6 +99,9 @@ static void bubble_sort_rec2(mint *arr, midx pass, midx n){
     if(pass == n)
         return;
     for(midx i = 0;i < n-pass-1;i++){
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 2, pass, ANSI_COLOR_BLUE, i, ANSI_COLOR_GREEN);
+#endif
         if(arr[i] > arr[i+1]){
             swap(&arr[i], &arr[i+1]);
         }
@@ -86,6 +110,9 @@ static void bubble_sort_rec2(mint *arr, midx pass, midx n){
 }
 
 void bubble_sort_rec(mint *arr, midx n){
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Bubble Sort Recursive");
+#endif
     bubble_sort_rec2(arr, 0, n);
 }
 
@@ -94,9 +121,15 @@ sort_test(bubble_sort_rec, SORT_TEST_ITEM_COUNT, 483);
 #endif
 
 void bubble_sort_adv(mint *arr, midx n){
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Bubble Sort Advanced");
+#endif
     for(midx pass = 0;pass < n;pass++){
         mint flag = 0;
         for(midx i = 0;i < n - pass - 1;i++){
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 2, pass, ANSI_COLOR_BLUE, i, ANSI_COLOR_GREEN);
+#endif
             if(arr[i] > arr[i+1]){
                 swap(&arr[i], &arr[i+1]);
                 flag = 1;
@@ -112,15 +145,27 @@ sort_test(bubble_sort_adv, SORT_TEST_ITEM_COUNT, 281);
 #endif
 
 void insertion_sort(mint *arr, midx n){
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Insertion Sort");
+#endif
     for(midx i = 0; i < n; i++){
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 1, i, ANSI_COLOR_GREEN);
+#endif
         mint k = arr[i];
         midx j = i - 1;
         while(j >= 0 && k < arr[j]){
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 2, i, ANSI_COLOR_GREEN, j, ANSI_COLOR_BLUE, k, ANSI_COLOR_RED);
+#endif
             arr[j+1] = arr[j];
             j--;
         }
         arr[j + 1] = k;
     }
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 0);
+#endif
 }
 
 #ifdef SORT_ENABLE_TEST_INSERTION
@@ -149,9 +194,15 @@ sort_test(insertion_sort_rec, SORT_TEST_ITEM_COUNT, 38892);
 #endif
 
 void selection_sort(mint *arr, midx n){
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Selection Sort");
+#endif
     for(midx i = 0;i < n;i++){
         midx minidx = i;
         for(midx j = i+1;j < n;j++){
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 2, i, ANSI_COLOR_GREEN, j, ANSI_COLOR_BLUE);
+#endif
             if(arr[j] < arr[minidx]){
                 minidx = j;
             }
@@ -159,6 +210,9 @@ void selection_sort(mint *arr, midx n){
         if(minidx != i)
             swap(&arr[i], &arr[minidx]);
     }
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 0);
+#endif
 }
 
 #ifdef SORT_ENABLE_TEST_SELECTION
@@ -186,68 +240,36 @@ void selection_sort_rec(mint *arr, midx n){
 sort_test(selection_sort_rec, SORT_TEST_ITEM_COUNT, 788498);
 #endif
 
-#ifdef QUICK_SORT_VISUAL
-
-#include <stdio.h>
-
-static void quick_sort_print(mint *arr, midx n, midx i, midx j, midx pivot){
-    printf(" ");
-    for(midx k = 0; k < n;k++){
-        if(k == i)
-            printf(ANSI_FONT_BOLD ANSI_COLOR_BLUE);
-        else if(k == j)
-            printf(ANSI_FONT_BOLD ANSI_COLOR_GREEN);
-        else if(k == pivot)
-            printf(ANSI_FONT_BOLD ANSI_COLOR_YELLOW);
-        printf("%" PRIint "  " ANSI_COLOR_RESET, arr[k]);
-    }
-}
-
-#endif
-
 static midx quick_sort_partition(mint *arr, midx m, midx n, midx total){
     mint pivot = arr[m];
     midx i = m;
     midx j = n + 1;
-#ifdef QUICK_SORT_VISUAL
-    dbg("Initially   : ");
-    quick_sort_print(arr, total, i, j, m);
-#endif
     do{
-#ifdef QUICK_SORT_VISUAL
-        dbg("Start itn.  : ");
-        quick_sort_print(arr, total, i, j, m);
+#ifdef SORT_ENABLE_VISUAL
+        histo_draw(arr, total, 1, m, ANSI_COLOR_RED);
 #endif
         do{
             i++;
-#ifdef QUICK_SORT_VISUAL
-            dbg("Increment i : ");
-            quick_sort_print(arr, total, i, j, m);
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, total, 2, i, ANSI_COLOR_BLUE, m, ANSI_COLOR_RED);
 #endif
         } while(i < total-1 && arr[i] < pivot);
         do{
             j--;
-#ifdef QUICK_SORT_VISUAL
-            dbg("Decrement j : ");
-            quick_sort_print(arr, total, i, j, m);
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, total, 3, i, ANSI_COLOR_BLUE, j, ANSI_COLOR_GREEN, m, ANSI_COLOR_RED);
 #endif
         } while(arr[j] > pivot);
         if(i < j){
             swap(&arr[i], &arr[j]);
-#ifdef QUICK_SORT_VISUAL
-            dbg("Do swap i-j : ");
-            quick_sort_print(arr, total, i, j, m);
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, total, 3, i, ANSI_COLOR_BLUE, j, ANSI_COLOR_GREEN, m, ANSI_COLOR_RED);
 #endif
         }
-#ifdef QUICK_SORT_VISUAL
-        printf("\n");
-#endif
     } while(i < j);
     swap(&arr[m], &arr[j]);
-#ifdef QUICK_SORT_VISUAL
-    dbg("Do swap p-j : ");
-    quick_sort_print(arr, total, i, j, m);
-    printf("\n");
+#ifdef SORT_ENABLE_VISUAL
+    histo_draw(arr, total, 3, i, ANSI_COLOR_BLUE, j, ANSI_COLOR_GREEN, m, ANSI_COLOR_RED);
 #endif
     return j;
 }
@@ -261,24 +283,23 @@ void quick_sort2(mint *arr, midx m, midx n, midx total){
 }
 
 void quick_sort(mint *arr, midx n){
-#ifdef QUICK_SORT_VISUAL
-    dbg("QuickSorting...");
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Quick Sort");
 #endif
     quick_sort2(arr, 0, n - 1, n);
-#ifdef QUICK_SORT_VISUAL
-    dbg("\n");
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 0);
 #endif
 }
 
 #ifdef SORT_ENABLE_TEST_QUICK
-#ifdef QUICK_SORT_VISUAL
-sort_test(quick_sort, 20, 10);
-#else
 sort_test(quick_sort, SORT_TEST_ITEM_COUNT, 89893);
-#endif
 #endif
 
 void quick_sort_nonrec(mint *arr, midx n){
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Quick Sort Nonrecursive");
+#endif
     Stack start = stack_new(n/2 + 1, 0);
     Stack stop = stack_new(n/2 + 1, 0);
     stack_push_fast(start, 0);
@@ -302,16 +323,19 @@ void quick_sort_nonrec(mint *arr, midx n){
 }
 
 #ifdef SORT_ENABLE_TEST_QUICK_NONREC
-#ifdef QUICK_SORT_VISUAL
-sort_test(quick_sort_nonrec, 20, 10);
-#else
 sort_test(quick_sort_nonrec, SORT_TEST_ITEM_COUNT, 87487);
 #endif
-#endif
 
+#ifdef SORT_ENABLE_VISUAL
+static void sorted_merge(mint *arr, midx l, midx m, midx u, mint *aux, mint total){
+#else
 static void sorted_merge(mint *arr, midx l, midx m, midx u, mint *aux){
+#endif
     midx pointer = 0, mid = m + 1, low = l;
     while(low <= m && mid <= u){
+#ifdef SORT_ENABLE_VISUAL
+        histo_draw(arr, total, 3, low, ANSI_COLOR_BLUE, m, ANSI_COLOR_RED, mid, ANSI_COLOR_GREEN);
+#endif
         if(arr[low] > arr[mid]){
             aux[pointer] = arr[mid];
             mid++;
@@ -323,34 +347,62 @@ static void sorted_merge(mint *arr, midx l, midx m, midx u, mint *aux){
         pointer++;
     }
     while(low <= m){
+#ifdef SORT_ENABLE_VISUAL
+        histo_draw(arr, total, 3, low, ANSI_COLOR_BLUE, m, ANSI_COLOR_RED, mid, ANSI_COLOR_GREEN);
+#endif
         aux[pointer] = arr[low];
         low++; pointer++;
     }
     while(mid <= u){
+#ifdef SORT_ENABLE_VISUAL
+        histo_draw(arr, total, 3, low, ANSI_COLOR_BLUE, m, ANSI_COLOR_RED, mid, ANSI_COLOR_GREEN);
+#endif
         aux[pointer] = arr[mid];
         mid++; pointer++;
     }
-    for(midx i = 0;i < pointer;i++)
+    for(midx i = 0;i < pointer;i++){
+#ifdef SORT_ENABLE_VISUAL
+        histo_draw(arr, total, 3, low, ANSI_COLOR_BLUE, i+l, ANSI_COLOR_RED, mid, ANSI_COLOR_GREEN);
+#endif
         arr[i + l] = aux[i];
+    }
 }
 
+#ifdef SORT_ENABLE_VISUAL
+static void merge_sort2(mint *arr, midx l, midx u, mint *aux, mint total){
+#else
 static void merge_sort2(mint *arr, midx l, midx u, mint *aux){
+#endif
     if(l >= u)
         return;
     midx m = (l+u)/2;
+#ifdef SORT_ENABLE_VISUAL
+    merge_sort2(arr, l, m, aux, total);
+    merge_sort2(arr, m+1, u, aux, total);
+    sorted_merge(arr, l, m, u, aux, total);
+#else
     merge_sort2(arr, l, m, aux);
     merge_sort2(arr, m+1, u, aux);
     sorted_merge(arr, l, m, u, aux);
+#endif
 }
 
 void merge_sort(mint *arr, midx n){
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Merge Sort");
+#endif
     mint *aux = arr_new(n);
+#ifdef SORT_ENABLE_VISUAL
+    merge_sort2(arr, 0, n - 1, aux, n);
+    histo_draw(arr, n, 0);
+#else
     merge_sort2(arr, 0, n - 1, aux);
+#endif
     arr_free(aux);
 }
 
 #ifdef SORT_ENABLE_TEST_MERGE
-sort_test(merge_sort, SORT_TEST_ITEM_COUNT, 84982);
+sort_test(merge_sort, SORT_TEST_ITEM_COUNT, 986798);
 #endif
 
 void merge_sort_nonrec(mint *arr, midx n){
@@ -364,6 +416,9 @@ void merge_sort_nonrec(mint *arr, midx n){
 
     stack_push_fast(start, 0);
     stack_push_fast(stop, n - 1);
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Merge Sort Nonrecursive");
+#endif
     while(!stack_is_empty(start)){
         midx s = stack_pop_fast(start);
         midx e = stack_pop_fast(stop);
@@ -384,7 +439,11 @@ void merge_sort_nonrec(mint *arr, midx n){
         midx b = stack_pop_fast(beg);
         midx m = stack_pop_fast(mid);
         midx e = stack_pop_fast(end);
+#ifdef SORT_ENABLE_VISUAL
+        sorted_merge(arr, b, m, e, aux, n);
+#else
         sorted_merge(arr, b, m, e, aux);
+#endif
     }
 
     arr_free(aux);
@@ -403,6 +462,9 @@ static mint* heap_create(mint *arr, midx n){
         midx j = i;
         while(j > 0){
             midx parent = (j+1)/2 - 1;
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, n, 2, j, ANSI_COLOR_BLUE, parent, ANSI_COLOR_RED);
+#endif
             // Min heap
             if(heap[j] < heap[parent]){
                 swap(&heap[j], &heap[parent]);
@@ -415,13 +477,20 @@ static mint* heap_create(mint *arr, midx n){
     return heap;
 }
 
+#ifdef SORT_ENABLE_VISUAL
+static void heap_rebuild(mint *arr, midx n, midx total){
+#else
 static void heap_rebuild(mint *arr, midx n){
+#endif
     if(n == 1)
         return;
     midx j = 0;
     while(1){
         midx leftChild = (j * 2) + 1, rightChild = (j * 2) + 2;
         midx min = j;
+#ifdef SORT_ENABLE_VISUAL
+            histo_draw(arr, total, 3, leftChild, ANSI_COLOR_BLUE, j, ANSI_COLOR_RED, rightChild, ANSI_COLOR_GREEN);
+#endif
         if(leftChild < n && arr[leftChild] < arr[min]){
             min = leftChild;
         }
@@ -438,11 +507,18 @@ static void heap_rebuild(mint *arr, midx n){
 }
 
 void heap_sort(mint *arr, midx n){
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Heap Sort");
+#endif
     mint *heap = heap_create(arr, n);
     for(midx i = n, j = 0;i > 0;i--,j++){
         arr[j] = heap[0];
         heap[0] = heap[i - 1];
+#ifdef SORT_ENABLE_VISUAL
+        heap_rebuild(heap, i - 1, n);
+#else
         heap_rebuild(heap, i - 1);
+#endif
     }
     arr[n - 1] = heap[0];
     arr_free(heap);

@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
+#include <stdarg.h>
+
+#include "histogram.h"
+#include "display.h"
+
+typedef struct{
+    mint a, b;
+} Tuple;
+
+typedef struct{
+    midx index;
+    const char* color;
+} CustomColor;
+
+static const char *title[] = {"SampleTitle"};
+
+void histo_set_title(const char *tie){
+    title[0] = tie;
+}
+
+static Tuple find_max_min(mint *arr, midx n){
+    mint min = arr[0];
+    mint max = arr[0];
+    for(midx i = 1;i < n;i++){
+        if(arr[i] > max)
+            max = arr[i];
+        else if(arr[i] < min)
+            min = arr[i];
+    }
+    Tuple t = {max, min};
+    return t;
+}
+
+#define NUM_STEPS 30
+
+static mint lastMax = 0;
+
+void histo_draw(mint *arr, midx n, mint colorCount, ...){
+    CustomColor colors[colorCount];
+    va_list args;
+    va_start(args, colorCount);
+    for(mint i = 0;i < colorCount;i++){
+        colors[i].index = va_arg(args, midx);
+        colors[i].color = va_arg(args, const char*);
+    }
+    va_end(args);
+    Tuple max_min = find_max_min(arr, n);
+    double max = max_min.a;
+    while(lastMax++ < 40){
+        printf("\n");
+        fflush(stdout);
+    }
+    double min = max_min.b - 1;
+    double steps = (double)(max - min) / NUM_STEPS;
+    mint stepCount = 1, lastStepPrint = 1;
+    steps = !steps ? 1 : steps;
+    if(strcmp(title[0], "SampleTitle"))
+        printf(ANSI_FONT_BOLD "Histogram : %s\n\n" ANSI_COLOR_RESET, title[0]);
+    for(double i = max;i >= min;i -= steps, stepCount++){
+        if(stepCount == 1 || (stepCount - lastStepPrint > 1 && ((i - steps) < min || stepCount % 5 == 0))){
+            printf("%-4.0f", i);
+            lastStepPrint = stepCount;
+        }
+        else
+            printf("    ");
+        for(midx j = 0;j < n;j++){
+            if(arr[j] >= i){
+                if(colorCount > 0){
+                    for(mint k = 0;k < colorCount;k++){
+                        if(colors[k].index == j){
+                            printf(colors[k].color);
+                            printf("    \u2584" ANSI_COLOR_RESET);
+                            goto colorend;
+                        }
+                    }
+                }
+                printf("    \u2588");
+            }
+            else
+                printf("     ");
+colorend:;
+        }
+        printf("\n");
+    }
+    printf("\n    ");
+    for(midx i = 0;i < n;i++){
+        printf("%5" PRIint, arr[i]);
+    }
+    //while(stepCount++ < 40)
+        printf("\n");
+        lastMax = stepCount + 1;
+    fflush(stdout);
+    struct timespec t;
+    //t.tv_nsec = 1000 * 1000 * 1000;
+    t.tv_nsec = 1000 * 1000 * 90;
+    t.tv_sec = 0;
+    nanosleep(&t, NULL);
+}
+
+//void histo_draw_and_sleep(mint *arr, midx n){
+//    histo_draw(arr, n);
+//}
+
+/*int main2(){
+    mint *arr = arr_new(30);
+    arr_fill_rand(arr, 30, 30, SAMPLE_CASE_AVERAGE);
+    for(mint i = 0; i < 5; i++){
+        histo_draw(arr, 30);
+        arr_fill_rand(arr, 30, 1000, SAMPLE_CASE_AVERAGE);
+    }
+    printf("\n");
+    return 1;
+}*/
