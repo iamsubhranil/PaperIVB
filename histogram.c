@@ -99,18 +99,3 @@ colorend:;
     t.tv_sec = 0;
     nanosleep(&t, NULL);
 }
-
-//void histo_draw_and_sleep(mint *arr, midx n){
-//    histo_draw(arr, n);
-//}
-
-/*int main2(){
-    mint *arr = arr_new(30);
-    arr_fill_rand(arr, 30, 30, SAMPLE_CASE_AVERAGE);
-    for(mint i = 0; i < 5; i++){
-        histo_draw(arr, 30);
-        arr_fill_rand(arr, 30, 1000, SAMPLE_CASE_AVERAGE);
-    }
-    printf("\n");
-    return 1;
-}*/
