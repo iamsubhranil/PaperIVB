@@ -2,8 +2,8 @@
 
 #include "common.h"
 
-#ifndef BST_ITEM_COUNT
-#define BST_ITEM_COUNT 10000
+#ifndef BST_TEST_ITEM_COUNT
+#define BST_TEST_ITEM_COUNT 10000
 #endif
 
 typedef struct BinarySearchTree{
