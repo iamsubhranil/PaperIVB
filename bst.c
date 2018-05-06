@@ -89,9 +89,9 @@ static mint test_bst_create(midx n){
 }
 
 void test_bst(){
-    TEST("Binary Search Tree Creation", test_bst_create(BST_ITEM_COUNT));
+    TEST("Binary Search Tree Creation", test_bst_create(BST_TEST_ITEM_COUNT));
     BinarySearchTree *bst = bst_test_gen;
     TEST("Binary Search Tree Searching", bst_search(bst, bst->left->value));
-    TEST("Binary Search Tree Insertion", test_bst_insert(bst, random_at_most(BST_ITEM_COUNT)));
+    TEST("Binary Search Tree Insertion", test_bst_insert(bst, random_at_most(BST_TEST_ITEM_COUNT)));
     bst_free(bst);
 }
