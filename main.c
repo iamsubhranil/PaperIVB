@@ -7,10 +7,10 @@
 #include "queue.h"
 
 int main(){
-    test_stack();
     test_arr();
+    test_stack();
+    test_queue();
     test_sort();
     test_bst();
-    test_queue();
     printf("\n");
 }
