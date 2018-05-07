@@ -10,6 +10,9 @@ target_link_libraries(array test
 add_library(stack SHARED stack.c)
 target_link_libraries(stack test)
 
+add_library(queue SHARED queue.c)
+target_link_libraries(queue test)
+
 add_library(histogram SHARED histogram.c)
 
 add_library(sort SHARED sort.c)
@@ -24,6 +27,7 @@ target_link_libraries(bst   test
 
 add_executable(paperivb main.c)
 target_link_libraries(paperivb sort
-                                bst)
+                                bst
+                                queue)
 
 add_definitions(-DSORT_ENABLE_TEST_ALL -DSORT_TEST_ITEM_COUNT=100000 -DBST_TEST_ITEM_COUNT=100000)

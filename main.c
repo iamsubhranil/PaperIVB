@@ -4,11 +4,13 @@
 #include "stack.h"
 #include "sort.h"
 #include "bst.h"
+#include "queue.h"
 
 int main(){
     test_stack();
     test_arr();
     test_sort();
     test_bst();
+    test_queue();
     printf("\n");
 }
