@@ -19,7 +19,8 @@ add_library(sort SHARED sort.c)
 target_link_libraries(sort  test
                             stack
                             array
-                            histogram)
+                            histogram
+                            queue)
 
 add_library(bst SHARED bst.c)
 target_link_libraries(bst   test

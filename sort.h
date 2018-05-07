@@ -24,6 +24,8 @@ ADD_METHOD(bubble_sort, void)
 ADD_METHOD(bubble_sort_rec, void)
 ADD_METHOD(bubble_sort_adv, void)
 
+ADD_METHOD(radix_sort, void)
+
 void test_sort();
 
 #ifndef SORT_TEST_ITEM_COUNT // Don't redefine sample count if it is specified at cmd
@@ -45,4 +47,5 @@ void test_sort();
 #define SORT_ENABLE_TEST_HEAP
 #define SORT_ENABLE_TEST_MERGE
 #define SORT_ENABLE_TEST_MERGE_NONREC
+#define SORT_ENABLE_TEST_RADIX
 #endif

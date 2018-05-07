@@ -3,6 +3,7 @@
 #include "test.h"
 #include "display.h"
 #include "stack.h"
+#include "queue.h"
 
 #ifdef SORT_ENABLE_VISUAL
 
@@ -528,6 +529,69 @@ void heap_sort(mint *arr, midx n){
 sort_test(heap_sort, SORT_TEST_ITEM_COUNT, 985893);
 #endif
 
+void radix_sort(mint *arr, midx n){
+#ifdef SORT_ENABLE_VISUAL
+    histo_set_title("Radix Sort");
+#endif
+    mint max = arr[0];
+    for(midx i = 1;i < n;i++)
+        if(arr[i] > max)
+            max =  arr[i];
+
+    mint passes = 1;
+    if(max < 0)
+        max = -max;
+    while(max > 0){
+        passes++;
+        max /= 10;
+    }
+
+    Queue queue[20];
+    for(mint i = 0;i < 20;i++)
+        queue[i] = queue_new(n);
+
+    mint pwr = 1;
+    for(mint i = 0;i < passes;i++){
+        for(mint j = 0;j < n;j++){
+            mint tmp = arr[j] < 0 ? -arr[j] : arr[j];
+            mint bucket = (tmp / pwr) % 10;
+            if(arr[j] >= 0)
+                bucket += 10;
+            else{
+                bucket = 9 - bucket;
+            }
+            queue_insert(queue[bucket], arr[j]);
+        }
+        
+        mint bucket = 0;
+        
+        for(mint j = 0;j < n;){
+            while(queue_is_empty(queue[bucket]))
+                bucket++;
+            while(!queue_is_empty(queue[bucket])){
+#ifdef SORT_ENABLE_VISUAL
+                histo_draw(arr, n, 1, j, ANSI_COLOR_BLUE);
+#endif
+                arr[j] = queue_delete(queue[bucket]);
+                j++;
+            }
+            bucket++;
+        }
+        pwr *= 10;
+    }
+
+    for(mint i = 0;i < 20;i++)
+        queue_free(queue[i]);
+
+#ifdef SORT_ENABLE_VISUAL
+    histo_draw(arr, n, 0);
+#endif
+}
+
+#ifdef SORT_ENABLE_TEST_RADIX
+sort_test(radix_sort, SORT_TEST_ITEM_COUNT, 58683);
+#endif
+
 void test_sort(){
 #ifdef SORT_ENABLE_TEST_BUBBLE
     TEST("Bubble Sort", test_bubble_sort());
@@ -564,5 +628,8 @@ void test_sort(){
 #endif
 #ifdef SORT_ENABLE_TEST_HEAP
     TEST("Heap Sort", test_heap_sort());
+#endif
+#ifdef SORT_ENABLE_TEST_RADIX
+    TEST("Radix Sort", test_radix_sort());
 #endif
 }
