@@ -247,12 +247,12 @@ static midx quick_sort_partition(mint *arr, midx m, midx n, midx total){
     midx j = n + 1;
     do{
 #ifdef SORT_ENABLE_VISUAL
-        histo_draw(arr, total, 1, m, ANSI_COLOR_RED);
+            histo_draw(arr, total, 3, i, ANSI_COLOR_BLUE, j, ANSI_COLOR_GREEN, m, ANSI_COLOR_RED);
 #endif
         do{
             i++;
 #ifdef SORT_ENABLE_VISUAL
-            histo_draw(arr, total, 2, i, ANSI_COLOR_BLUE, m, ANSI_COLOR_RED);
+            histo_draw(arr, total, 3, i, ANSI_COLOR_BLUE, j, ANSI_COLOR_GREEN, m, ANSI_COLOR_RED);
 #endif
         } while(i < total-1 && arr[i] < pivot);
         do{
