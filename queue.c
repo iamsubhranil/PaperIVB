@@ -3,6 +3,7 @@
 #include "queue.h"
 #include "display.h"
 #include "test.h"
+#include "utils.h"
 
 /* Architechture
  * =============
@@ -65,13 +66,13 @@ typedef struct CircularQueue{
     mint *arr;
     mint front;
     mint rear;
-    mint count;
+    mint size;
     mints status; // 0->normal, 1 -> full, 2->empty
 } CircularQueue;
 
 CircularQueue* queue_new(mint size){
     CircularQueue *queue = (CircularQueue *)malloc(sizeof(CircularQueue));
-    queue->count = size;
+    queue->size = size;
     queue->arr = (mint *)malloc(sizeof(mint) * size);
     queue->rear = 0;
     queue->front = -1;
@@ -88,13 +89,23 @@ mint queue_is_empty(CircularQueue *queue){
 }
 
 mint queue_count(CircularQueue *queue){
+    if(queue_is_full(queue))
+        return queue->size;
+    if(queue_is_empty(queue))
+        return 0;
     if(queue->front < queue->rear)
         return queue->rear - queue->front;
-    return queue->count - (queue->front - queue->rear);
+    return queue->size - (queue->front - queue->rear);
 }
 
 mint queue_size(CircularQueue *queue){
-    return queue->count;
+    return queue->size;
+}
+
+void queue_reset(CircularQueue *queue){
+    queue->status = STATUS_EMPTY;
+    queue->front = -1;
+    queue->rear = 0;
 }
 
 static inline void check_if_full(CircularQueue *queue){
@@ -105,14 +116,14 @@ static inline void check_if_full(CircularQueue *queue){
 }
 
 static inline void decr_pointer(CircularQueue *queue, mint *val){
-    if(*val == 0)
-        *val = queue->count - 1;
+    if(*val == 0 || *val == -1)
+        *val = queue->size - 1;
     else
         *val = (*val - 1);
 }
 
 static inline void incr_pointer(CircularQueue *queue, mint *val){
-    *val = (*val + 1) % queue->count;
+    *val = (*val + 1) % queue->size;
 }
 
 void queue_insert(CircularQueue* queue, mint value){
@@ -173,32 +184,67 @@ static mint test_queue_new(mint size){
 }
 
 static mint test_queue_insert(CircularQueue *queue, mint value){
-    mint bak = queue->rear;
-    queue_insert(queue, value);
-    return queue->arr[bak] == value;
+    mint bak = random_at_most(value);
+    while(!queue_is_full(queue)){
+        bak = random_at_most(value);
+        queue_insert(queue, bak);
+    }
+    mint p = queue->rear;
+    decr_pointer(queue, &p);
+    return queue->arr[p] == bak;
 }
 
 static mint test_queue_insert_at_front(CircularQueue *queue, mint value){
-    mint bak = queue->front;
-    decr_pointer(queue, &bak);
-    queue_insert_at_front(queue, value);
-    return queue->arr[bak] == value;
+    queue_reset(queue);
+    mint bak = random_at_most(value);
+    mint p = queue->rear;
+    decr_pointer(queue, &p);
+    mint rear = queue->rear;
+    while(!queue_is_full(queue)){
+        bak = random_at_most(value);
+        queue_insert_at_front(queue, bak);
+    }
+    return queue->arr[queue->front] == bak && queue->rear == rear;
 }
 
 static mint test_queue_delete(CircularQueue *queue){
-    mint val = queue->arr[queue->front];
-    return queue_delete(queue) == val;
+    queue_reset(queue);
+    mint bak = random_at_most(73723);
+    queue_insert(queue, bak);
+    while(!queue_is_full(queue)){
+        bak = random_at_most(477285);
+        queue_insert_at_front(queue, bak);
+    }
+    return queue_delete(queue) == bak;
 }
 
 static mint test_queue_delete_from_rear(CircularQueue *queue){
-    mint val = queue->arr[queue->rear == 0 ? (queue->count - 1) : (queue->rear - 1)];
-    return queue_delete_from_rear(queue) == val;
+    queue_reset(queue);
+    mint bak = random_at_most(73723);
+    queue_insert(queue, bak);
+    while(!queue_is_full(queue)){
+        bak = random_at_most(477285);
+        queue_insert(queue, bak);
+    }
+    return queue_delete_from_rear(queue) == bak;
 }
 
 static mint test_queue_count(CircularQueue *queue){
-    for(mint i = 0;i < 6;i++)
-        queue_insert(queue, i);
-    return queue_count(queue) == 6;
+    queue_reset(queue);
+    mint testSize = random_at_most(queue->size);
+    for(mint i = 0;i < testSize;i++)
+        queue_insert(queue, random_at_most(46734));
+    if(queue_count(queue) != testSize)
+        return 0;
+    while(!queue_is_full(queue))
+        queue_insert(queue, random_at_most(988945));
+    if(queue_count(queue) != queue->size)
+        return 0;
+    while(!queue_is_empty(queue))
+        queue_delete(queue);
+    if(queue_count(queue) != 0)
+        return 0;
+    return 1;
 }
 
 static mint test_queue_circularity(CircularQueue *queue){
@@ -215,9 +261,9 @@ static mint test_queue_circularity(CircularQueue *queue){
 }
 
 void test_queue(){
-    TEST("Queue Creation", test_queue_new(10));
-    TEST("Queue Insertion", test_queue_insert(testQueue, 20));
-    TEST("Queue Insertion At Front", test_queue_insert_at_front(testQueue, 10));
+    TEST("Queue Creation", test_queue_new(100000));
+    TEST("Queue Insertion", test_queue_insert(testQueue, 4823));
+    TEST("Queue Insertion At Front", test_queue_insert_at_front(testQueue, 239943));
     TEST("Queue Deletion", test_queue_delete(testQueue));
     TEST("Queue Deletion From Rear", test_queue_delete_from_rear(testQueue));
     TEST("Queue Counting", test_queue_count(testQueue));

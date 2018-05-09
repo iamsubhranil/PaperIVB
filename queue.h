@@ -19,5 +19,6 @@ mint queue_is_full(Queue queue);
 mint queue_is_empty(Queue queue);
 mint queue_size(Queue queue); // allocated size of the queue
 mint queue_count(Queue queue); // no of elements currently present in the queue
+void queue_reset(Queue queue); // resets a queue to the intial state for reuse
 
 void test_queue();
