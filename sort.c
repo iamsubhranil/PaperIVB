@@ -11,12 +11,23 @@
 
 #endif
 
-static mint check_sort(mint *arr, midx n){
-    for(midx i = 0;i < n-1;i++){
-        if(arr[i] > arr[i+1]){
-            dbg("arr[%" PRIint "] : %" PRIint "\t arr[%" PRIint "] : %" PRIint "\n", i, arr[i], i+1, arr[i+1]);
-            return 0;
+mint check_sort(mint *arr, midx n, SortType type){
+    if(type == SORT_TYPE_ASCENDING){
+        for(midx i = 0;i < n-1;i++){
+            if(arr[i] > arr[i+1]){
+                dbg("arr[%" PRIint "] : %" PRIint "\t arr[%" PRIint "] : %" PRIint "\n", i, arr[i], i+1, arr[i+1]);
+                return 0;
+            }
         }
+    }
+    else{
+        for(midx i = 0;i < n-1;i++){
+            if(arr[i] < arr[i+1]){
+                dbg("arr[%" PRIint "] : %" PRIint "\t arr[%" PRIint "] : %" PRIint "\n", i, arr[i], i+1, arr[i+1]);
+                return 0;
+            }
+        }
+    
     }
     return 1;
 }
@@ -31,7 +42,7 @@ static mint check_sort(mint *arr, midx n){
         tst_resume("Best Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
-        if(!check_sort(arr, size)){ \
+        if(!check_sort(arr, size, SORT_TYPE_ASCENDING)){ \
             goto _test_fail_##name; \
         } \
         tst_pause("Generating random input : Worst Case"); \
@@ -39,7 +50,7 @@ static mint check_sort(mint *arr, midx n){
         tst_resume("Worst Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
-        if(!check_sort(arr, size)){ \
+        if(!check_sort(arr, size, SORT_TYPE_ASCENDING)){ \
             goto _test_fail_##name; \
         } \
         tst_pause("Generating random input : Average Case"); \
@@ -47,7 +58,7 @@ static mint check_sort(mint *arr, midx n){
         tst_resume("Average Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
-        if(!check_sort(arr, size)) { \
+        if(!check_sort(arr, size, SORT_TYPE_ASCENDING)) { \
             goto _test_fail_##name; \
         } \
         goto _test_done_##name; \

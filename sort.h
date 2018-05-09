@@ -2,6 +2,12 @@
 
 #include "common.h"
 
+typedef enum{
+    SORT_TYPE_ASCENDING = 0,
+    SORT_TYPE_DESCENDING = 1
+} SortType;
+mint check_sort(mint *arr, midx n, SortType type); // Checks whether an array is sorted
+
 #define ADD_METHOD(x, ret) \
     ret x(mint *arr, midx count); \
     mint test_##x();
