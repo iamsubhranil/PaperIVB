@@ -5,6 +5,8 @@
 #include "test.h"
 #include "utils.h"
 
+#ifdef QUEUE_ENABLE_CIRCULAR
+
 /* Architechture
  * =============
  * Here the circular queue is implemented by means of
@@ -75,7 +77,7 @@ CircularQueue* queue_new(mint size){
     queue->size = size;
     queue->arr = (mint *)malloc(sizeof(mint) * size);
     queue->rear = 0;
-    queue->front = -1;
+    queue->front = 0;
     queue->status = STATUS_EMPTY;
     return queue;
 }
@@ -104,35 +106,24 @@ mint queue_size(CircularQueue *queue){
 
 void queue_reset(CircularQueue *queue){
     queue->status = STATUS_EMPTY;
-    queue->front = -1;
+    queue->front = 0;
     queue->rear = 0;
 }
 
-static inline void check_if_full(CircularQueue *queue){
-    if(queue->status == STATUS_EMPTY)
-        queue->status = STATUS_OK;
-    if(queue->front == queue->rear)
-        queue->status = STATUS_FULL;
-}
+#define check_if_full(queue) \
+    queue->status = queue->front == queue->rear;
 
-static inline void decr_pointer(CircularQueue *queue, mint *val){
-    if(*val == 0 || *val == -1)
-        *val = queue->size - 1;
-    else
-        *val = (*val - 1);
-}
+#define decr_pointer(queue, val) \
+    --(*val) < 0 ? *val = queue->size - 1 : 1;
 
-static inline void incr_pointer(CircularQueue *queue, mint *val){
-    *val = (*val + 1) % queue->size;
-}
+#define incr_pointer(queue, val) \
+    ++(*val) == queue->size ? *val = 0 : 1;
 
 void queue_insert(CircularQueue* queue, mint value){
     if(queue_is_full(queue))
         return;
     queue->arr[queue->rear] = value;
     incr_pointer(queue, &queue->rear);
-    if(queue->front == -1)
-        queue->front = 0;
     check_if_full(queue);
 }
 
@@ -145,10 +136,7 @@ void queue_insert_at_front(CircularQueue *queue, mint value){
 }
 
 static inline void check_if_empty(CircularQueue *queue){
-    if(queue->status == STATUS_FULL)
-        queue->status = STATUS_OK;
-    if(queue->front == queue->rear)
-        queue->status = STATUS_EMPTY;
+    queue->status = queue->front == queue->rear ? 2 : 0;
 }
 
 mint queue_delete(CircularQueue *queue){
@@ -270,3 +258,5 @@ void test_queue(){
     TEST("Queue Circularity", test_queue_circularity(testQueue));
     queue_free(testQueue);
 }
+
+#endif

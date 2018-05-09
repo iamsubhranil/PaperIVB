@@ -2,7 +2,16 @@
 
 #include "common.h"
 
+#ifdef QUEUE_ENABLE_FAST // Enable fixed-front queue (queue_fast.c)
+typedef struct FastCircularQueue* Queue;
+#elif defined(QUEUE_ENABLE_LINK) // Enable linked queue (queue_linked.c)
+typedef struct LinkedQueue* Queue;
+#else
+#ifndef QUEUE_ENABLE_CIRCULAR // Default circular queue (queue.c)
+#define QUEUE_ENABLE_CIRCULAR
+#endif
 typedef struct CircularQueue* Queue;
+#endif
 
 Queue queue_new(mint size);
 void queue_free(Queue queue);
@@ -26,3 +35,4 @@ void test_queue();
 #ifndef QUEUE_TEST_ITEM_COUNT
 #define QUEUE_TEST_ITEM_COUNT 10000
 #endif
+

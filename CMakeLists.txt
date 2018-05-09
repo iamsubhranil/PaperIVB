@@ -14,7 +14,7 @@ add_library(stack SHARED stack.c)
 target_link_libraries(stack test
                             utils)
 
-add_library(queue SHARED queue.c)
+add_library(queue SHARED queue.c queue_fast.c queue_linked.c)
 target_link_libraries(queue test)
 
 add_library(histogram SHARED histogram.c)
