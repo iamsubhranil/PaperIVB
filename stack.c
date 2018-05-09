@@ -3,6 +3,7 @@
 #include "stack.h"
 #include "test.h"
 #include "arr.h"
+#include "utils.h"
 
 // Type agnostic API
 // =================

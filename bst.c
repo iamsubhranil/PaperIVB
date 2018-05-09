@@ -3,6 +3,7 @@
 #include "bst.h"
 #include "arr.h"
 #include "test.h"
+#include "utils.h"
 
 static BinarySearchTree* bst_new_node(){
     BinarySearchTree *node = (BinarySearchTree *)malloc(sizeof(BinarySearchTree));

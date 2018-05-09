@@ -5,10 +5,7 @@
 
 #include "histogram.h"
 #include "display.h"
-
-typedef struct{
-    mint a, b;
-} Tuple;
+#include "utils.h"
 
 typedef struct{
     midx index;
