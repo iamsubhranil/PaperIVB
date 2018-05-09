@@ -22,3 +22,7 @@ mint queue_count(Queue queue); // no of elements currently present in the queue
 void queue_reset(Queue queue); // resets a queue to the intial state for reuse
 
 void test_queue();
+
+#ifndef QUEUE_TEST_ITEM_COUNT
+#define QUEUE_TEST_ITEM_COUNT 10000
+#endif

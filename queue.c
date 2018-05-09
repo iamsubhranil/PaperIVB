@@ -261,7 +261,7 @@ static mint test_queue_circularity(CircularQueue *queue){
 }
 
 void test_queue(){
-    TEST("Queue Creation", test_queue_new(100000));
+    TEST("Queue Creation", test_queue_new(QUEUE_TEST_ITEM_COUNT));
     TEST("Queue Insertion", test_queue_insert(testQueue, 4823));
     TEST("Queue Insertion At Front", test_queue_insert_at_front(testQueue, 239943));
     TEST("Queue Deletion", test_queue_delete(testQueue));
