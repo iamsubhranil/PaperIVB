@@ -14,7 +14,7 @@ static BinarySearchTree* bst_new_node(){
     return node;
 }
 
-mint bst_insert(BinarySearchTree *bst, mint value){
+i64 bst_insert(BinarySearchTree *bst, i64 value){
     BinarySearchTree *tmp = bst, *prev = bst;
     while(tmp != NULL){
         //if(value == tmp->value)
@@ -36,10 +36,10 @@ mint bst_insert(BinarySearchTree *bst, mint value){
     return 1;
 }
 
-BinarySearchTree *bst_create(mint *arr, midx n){
+BinarySearchTree *bst_create(i64 *arr, siz n){
     BinarySearchTree *root = bst_new_node();
     root->value = arr[0];
-    for(midx i = 1;i < n;i++)
+    for(siz i = 1;i < n;i++)
         bst_insert(root, arr[i]);
     return root;
 }
@@ -52,7 +52,7 @@ void bst_free(BinarySearchTree *bst){
     free(bst);
 }
 
-mint bst_search(BinarySearchTree *bst, mint value){
+i64 bst_search(BinarySearchTree *bst, i64 value){
     for(BinarySearchTree *tmp = bst;tmp != NULL;tmp = value > tmp->value ? tmp->right : tmp->left)
         if(tmp->value == value)
             return 1;
@@ -85,9 +85,9 @@ void bst_postorder(BinarySearchTree *bst, bst_process process){
 
 static BinarySearchTree *bst_test_gen;
 
-static mint test_bst_create(midx n){
+static i64 test_bst_create(siz n){
     tst_pause("Generating random elements");
-    mint *arr = arr_new(n);
+    i64 *arr = arr_new(n);
     arr_fill_rand(arr, n, random_at_most(n), SAMPLE_CASE_AVERAGE);
     tst_resume("Creating BST");
     BinarySearchTree *bst = bst_create(arr, n);
@@ -99,13 +99,13 @@ static mint test_bst_create(midx n){
     return 1;
 }
 
-static mint test_bst_insert(BinarySearchTree *bst, mint value){
+static i64 test_bst_insert(BinarySearchTree *bst, i64 value){
     bst_insert(bst, value);
     if(!bst_search(bst, value))
         return 0;
-    mint nval = random_at_most(value);
+    i64 nval = random_at_most(value);
     while(nval > 0){
-        mint nval2 = random_at_most(value);
+        i64 nval2 = random_at_most(value);
         bst_insert(bst, nval2);
         if(!bst_search(bst, nval2))
             return 0;
@@ -114,15 +114,15 @@ static mint test_bst_insert(BinarySearchTree *bst, mint value){
     return 1;
 }
 
-static mint *bst_test_array;
-static midx bst_test_pointer = 0;
+static i64 *bst_test_array;
+static siz bst_test_pointer = 0;
 
-static void test_bst_order_process(mint value){
+static void test_bst_order_process(i64 value){
     bst_test_array[bst_test_pointer] = value;
     bst_test_pointer++;
 }
 
-static mint test_bst_inorder(){
+static i64 test_bst_inorder(){
     bst_test_pointer = 0;
     bst_test_array = arr_new(BST_TEST_ITEM_COUNT);
     arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 898213, SAMPLE_CASE_AVERAGE);
@@ -131,7 +131,7 @@ static mint test_bst_inorder(){
    
     bst_inorder(bst, test_bst_order_process);
 
-    mint ret = check_sort(bst_test_array, BST_TEST_ITEM_COUNT, SORT_TYPE_ASCENDING);
+    i64 ret = check_sort(bst_test_array, BST_TEST_ITEM_COUNT, SORT_TYPE_ASCENDING);
     
     free(bst_test_array);
     bst_test_pointer = 0;
@@ -140,7 +140,7 @@ static mint test_bst_inorder(){
     return ret; 
 }
 
-static mint test_bst_preorder(){
+static i64 test_bst_preorder(){
     bst_test_pointer = 0;
     bst_test_array = arr_new(BST_TEST_ITEM_COUNT);
     arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 898213, SAMPLE_CASE_BEST);
@@ -149,7 +149,7 @@ static mint test_bst_preorder(){
    
     bst_preorder(bst, test_bst_order_process);
 
-    mint ret = check_sort(bst_test_array, BST_TEST_ITEM_COUNT, SORT_TYPE_ASCENDING);
+    i64 ret = check_sort(bst_test_array, BST_TEST_ITEM_COUNT, SORT_TYPE_ASCENDING);
     
     free(bst_test_array);
     bst_test_pointer = 0;
@@ -158,16 +158,16 @@ static mint test_bst_preorder(){
     return ret; 
 }
 
-static mint test_bst_postorder(){
+static i64 test_bst_postorder(){
     bst_test_pointer = 0;
     bst_test_array = arr_new(BST_TEST_ITEM_COUNT);
-    arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 898213, SAMPLE_CASE_BEST);
+    arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 898213, SAMPLE_CASE_WORST);
     
     BinarySearchTree  *bst = bst_create(bst_test_array, BST_TEST_ITEM_COUNT);
    
     bst_preorder(bst, test_bst_order_process);
 
-    mint ret = check_sort(bst_test_array, BST_TEST_ITEM_COUNT, SORT_TYPE_DESCENDING);
+    i64 ret = check_sort(bst_test_array, BST_TEST_ITEM_COUNT, SORT_TYPE_DESCENDING);
     
     free(bst_test_array);
     bst_test_pointer = 0;
@@ -184,5 +184,5 @@ void test_bst(){
     bst_free(bst);
     TEST("Binary Search Tree Preorder", test_bst_preorder());
     TEST("Binary Search Tree Inorder", test_bst_inorder());
-    TEST("Binary Search Tree Postorder", test_bst_preorder());
+    TEST("Binary Search Tree Postorder", test_bst_postorder());
 }

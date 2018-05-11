@@ -5,11 +5,11 @@
 
 #include "common.h"
 
-#define arr_new(x) (mint *)malloc(sizeof(mint) * x)
+#define arr_new(x) (i64 *)malloc(sizeof(i64) * x)
 #define arr_free(x) free(x)
 
-void arr_fill(mint *arr, midx count, ...);
-void arr_fill_int(mint *arr, midx count, ...); // To fill in the array with 32 bit integer values only
+void arr_fill(i64 *arr, siz count, ...);
+void arr_fill_int(i64 *arr, siz count, ...); // To fill in the array with 32 bit integer values only
 
 // SampleCase denotes the type of the generated
 // list
@@ -25,10 +25,10 @@ typedef enum{
     SAMPLE_CASE_AVERAGE,
     SAMPLE_CASE_WORST
 } SampleCase;
-void arr_fill_rand(mint *arr, midx count, mint range, SampleCase scase);
+void arr_fill_rand(i64 *arr, siz count, i64 range, SampleCase scase);
 
-mint* arr_create();
-void arr_print(mint *arr, midx n);
-mint* arr_copy(mint *arr, midx n);
+i64* arr_create();
+void arr_print(i64 *arr, siz n);
+i64* arr_copy(i64 *arr, siz n);
 
 void test_arr();

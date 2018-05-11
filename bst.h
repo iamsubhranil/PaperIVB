@@ -7,21 +7,21 @@
 #endif
 
 typedef struct BinarySearchTree{
-    mint value;
+    i64 value;
     struct BinarySearchTree *left;
     struct BinarySearchTree *right;
 } BinarySearchTree;
 
-BinarySearchTree *bst_create(mint *arr, midx n);
+BinarySearchTree *bst_create(i64 *arr, siz n);
 void bst_free(BinarySearchTree *bst);
 
-mint bst_insert(BinarySearchTree *bst, mint value);
+i64 bst_insert(BinarySearchTree *bst, i64 value);
 
-mint bst_search(BinarySearchTree *bst, mint value);
+i64 bst_search(BinarySearchTree *bst, i64 value);
 
-mint bst_delete(BinarySearchTree *bst, mint value);
+i64 bst_delete(BinarySearchTree *bst, i64 value);
 
-typedef void(*bst_process)(mint);
+typedef void(*bst_process)(i64);
 
 void bst_preorder(BinarySearchTree *bst, bst_process process);
 void bst_preorder_nonrec(BinarySearchTree *bst, bst_process process);
@@ -32,7 +32,7 @@ void bst_inorder_nonrec(BinarySearchTree *bst, bst_process process);
 void bst_postorder(BinarySearchTree *bst, bst_process process);
 void bst_preorder_nonrec(BinarySearchTree *bst, bst_process process);
 
-mint bst_count_leaves(BinarySearchTree *bst);
-mint bst_count_internal(BinarySearchTree *bst);
+i64 bst_count_leaves(BinarySearchTree *bst);
+i64 bst_count_internal(BinarySearchTree *bst);
 
 void test_bst();

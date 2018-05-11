@@ -15,12 +15,12 @@ static void header(){
 
 static void line_clear(){
     printf("\r");
-    for(midx i = 0;i < 80;i++)
+    for(siz i = 0;i < 80;i++)
         printf(" ");
 }
 
 static const char *testName[] = {"SampleTest"};
-static mint paused = 0;
+static i64 paused = 0;
 
 void tst_start(const char *name){
     if(!paused && start == 0)

@@ -5,25 +5,25 @@
 #ifdef QUEUE_ENABLE_LINK
 
 typedef struct LinkedNode{
-    mint val;
+    i64 val;
     struct LinkedNode *next;
 } LinkedNode;
 
 typedef struct LinkedQueue{
     LinkedNode *rear;
     LinkedNode *front;
-    mint size;
-    mint count;
+    i64 size;
+    i64 count;
 } LinkedQueue;
 
-static LinkedNode* linkednode_get(mint val){
+static LinkedNode* linkednode_get(i64 val){
     LinkedNode *node = (LinkedNode *)malloc(sizeof(LinkedNode));
     node->next = NULL;
     node->val = val;
     return node;
 }
 
-LinkedQueue* queue_new(mint size){
+LinkedQueue* queue_new(i64 size){
     LinkedQueue *q = (LinkedQueue *)malloc(sizeof(LinkedQueue));
     q->count = 0;
     q->size = size;
@@ -44,7 +44,7 @@ void queue_free(LinkedQueue *q){
     free(q);
 }
 
-void queue_insert(LinkedQueue *q, mint val){
+void queue_insert(LinkedQueue *q, i64 val){
     if(q->count == q->size)
         return;
     if(q->rear == NULL){
@@ -58,7 +58,7 @@ void queue_insert(LinkedQueue *q, mint val){
     q->count++;
 }
 
-void queue_insert_at_front(LinkedQueue *q, mint val){
+void queue_insert_at_front(LinkedQueue *q, i64 val){
     if(q->count == q->size)
         return;
     if(q->rear == NULL){
@@ -72,10 +72,10 @@ void queue_insert_at_front(LinkedQueue *q, mint val){
     q->count++;
 }
 
-mint queue_delete(LinkedQueue *q){
+i64 queue_delete(LinkedQueue *q){
     if(q->count == 0)
         return 0;
-    mint bak = q->front->val;
+    i64 bak = q->front->val;
     LinkedNode *n = q->front;
     q->front = q->front->next;
     if(!q->front)
@@ -85,11 +85,11 @@ mint queue_delete(LinkedQueue *q){
     return bak;
 }
 
-mint queue_delete_from_rear(LinkedQueue *q){
+i64 queue_delete_from_rear(LinkedQueue *q){
     if(q->count == 0)
         return 0;
     LinkedNode *bak = q->rear;
-    mint bval = bak->val;
+    i64 bval = bak->val;
     LinkedNode *parent = q->front;
     while(parent->next != bak) parent = parent->next;
     parent->next = NULL;
@@ -98,19 +98,19 @@ mint queue_delete_from_rear(LinkedQueue *q){
     return bval;
 }
 
-mint queue_is_full(LinkedQueue *q){
+u8 queue_is_full(LinkedQueue *q){
     return q->count == q->size;
 }
 
-mint queue_is_empty(LinkedQueue *q){
+u8 queue_is_empty(LinkedQueue *q){
     return q->count == 0;
 }
 
-mint queue_size(LinkedQueue *q){
+i64 queue_size(LinkedQueue *q){
     return q->size;
 }
 
-mint queue_count(LinkedQueue *q){
+i64 queue_count(LinkedQueue *q){
     return q->count;
 }
 
@@ -123,7 +123,7 @@ void queue_reset(LinkedQueue *q){
 
 static LinkedQueue *testQueue;
 
-static mint test_queue_new(mint size){
+static i64 test_queue_new(i64 size){
     LinkedQueue *queue = queue_new(size);
     if(!queue)
         return 0;
@@ -131,8 +131,8 @@ static mint test_queue_new(mint size){
     return 1;
 }
 
-static mint test_queue_insert(LinkedQueue *queue, mint value){
-    mint bak = random_at_most(value);
+static i64 test_queue_insert(LinkedQueue *queue, i64 value){
+    i64 bak = random_at_most(value);
     while(!queue_is_full(queue)){
         bak = random_at_most(value);
         queue_insert(queue, bak);
@@ -140,11 +140,11 @@ static mint test_queue_insert(LinkedQueue *queue, mint value){
     return queue->rear->val == bak;
 }
 
-static mint test_queue_insert_at_front(LinkedQueue *queue, mint value){
+static i64 test_queue_insert_at_front(LinkedQueue *queue, i64 value){
     queue_reset(queue);
-    mint bak = random_at_most(value);
+    i64 bak = random_at_most(value);
     queue_insert(queue, bak);
-    mint rearval = queue->rear->val;
+    i64 rearval = queue->rear->val;
     while(!queue_is_full(queue)){
         bak = random_at_most(value);
         queue_insert_at_front(queue, bak);
@@ -152,9 +152,9 @@ static mint test_queue_insert_at_front(LinkedQueue *queue, mint value){
     return queue->front->val == bak && queue->rear->val == rearval;
 }
 
-static mint test_queue_delete(LinkedQueue *queue){
+static i64 test_queue_delete(LinkedQueue *queue){
     queue_reset(queue);
-    mint bak = random_at_most(73723);
+    i64 bak = random_at_most(73723);
     queue_insert(queue, bak);
     while(!queue_is_full(queue)){
         bak = random_at_most(477285);
@@ -163,9 +163,9 @@ static mint test_queue_delete(LinkedQueue *queue){
     return queue_delete(queue) == bak;
 }
 
-static mint test_queue_delete_from_rear(LinkedQueue *queue){
+static i64 test_queue_delete_from_rear(LinkedQueue *queue){
     queue_reset(queue);
-    mint bak = random_at_most(73723);
+    i64 bak = random_at_most(73723);
     queue_insert(queue, bak);
     while(!queue_is_full(queue)){
         bak = random_at_most(477285);
@@ -174,10 +174,10 @@ static mint test_queue_delete_from_rear(LinkedQueue *queue){
     return queue_delete_from_rear(queue) == bak;
 }
 
-static mint test_queue_count(LinkedQueue *queue){
+static i64 test_queue_count(LinkedQueue *queue){
     queue_reset(queue);
-    mint testSize = random_at_most(queue->size);
-    for(mint i = 0;i < testSize;i++)
+    i64 testSize = random_at_most(queue->size);
+    for(i64 i = 0;i < testSize;i++)
         queue_insert(queue, random_at_most(46734));
     if(queue_count(queue) != testSize)
         return 0;

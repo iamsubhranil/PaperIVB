@@ -3,7 +3,7 @@
 #include "common.h"
 
 typedef struct{
-    mint a, b;
+    i64 a, b;
 } Tuple;
 
-mint random_at_most(mint range);
+i64 random_at_most(i64 range);

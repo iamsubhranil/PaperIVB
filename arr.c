@@ -8,96 +8,96 @@
 #include "test.h"
 #include "utils.h"
 
-void arr_fill_int(mint *arr, midx count, ...){
+void arr_fill_int(i64 *arr, siz count, ...){
     va_list list;
     va_start(list, count);
-    for(midx i = 0;i < count;i++){ 
+    for(siz i = 0;i < count;i++){ 
         // Default int size is 32, which is also
         // default integer argument size. Casting it to 
-        // mint aka int64_t introduces some nasty
+        // i64 aka int64_t introduces some nasty
         // size mismatch bug at the multiple of 5,
         // producing garbage values as a result of
         // casting
         //
         // One remedy should be explicitly casting each
-        // argument to mint before/while passing.
+        // argument to i64 before/while passing.
         // The other is passing only integer elements,
         // while the cast will only be `int`.
         //
         // Hence, two separate methods are given to
         // justify these causes.
-        mint el = va_arg(list, int);
+        i64 el = va_arg(list, int);
 
         arr[i] = el;
     }
     va_end(list);
 }
 
-void arr_fill_rand(mint *arr, midx count, mint range, SampleCase scase){
+void arr_fill_rand(i64 *arr, siz count, i64 range, SampleCase scase){
     srand(time(NULL));
-    mint start = random_at_most(range);
-    while((scase == SAMPLE_CASE_BEST && MINT_MAX - start < count)
-            || (scase == SAMPLE_CASE_WORST && MINT_MAX + start < count))
+    i64 start = random_at_most(range);
+    while((scase == SAMPLE_CASE_BEST && (siz)(i64_MAX - start) < count)
+            || (scase == SAMPLE_CASE_WORST && (siz)(i64_MAX + start) < count))
         start = random_at_most(range);
     
-    for(midx i = 0;i < count;i++){
+    for(siz i = 0;i < count;i++){
         arr[i] = scase == SAMPLE_CASE_AVERAGE ? random_at_most(range) 
                 : scase == SAMPLE_CASE_BEST ? start++
                 : start--;
     }
 }
 
-void arr_fill(mint *arr, midx count, ...){
+void arr_fill(i64 *arr, siz count, ...){
     va_list list;
     va_start(list, count);
-    for(midx i = 0;i < count;i++){ 
-        mint el = va_arg(list, mint);
+    for(siz i = 0;i < count;i++){ 
+        i64 el = va_arg(list, i64);
         arr[i] = el;
     }
     va_end(list);
 }
 
-mint* arr_create(){
+i64* arr_create(){
 reinput:
     pgrn(ANSI_COLOR_GREEN ANSI_FONT_BOLD "[Input] " ANSI_COLOR_RESET);
     info("Size of the array : ");
-    midx size;
-    scanf("%" SCNidx, &size);
+    siz size;
+    scanf("%" Ssiz, &size);
     if(size < 1){
         err("Size must be >= 1!");
         goto reinput;
     }
-    mint* arr = arr_new(size);
+    i64* arr = arr_new(size);
     if(!arr){
         err("Array can not be initialized!");
         exit(1);
     }
-    for(midx i = 0;i < size;i++){
-        pblue(ANSI_FONT_BOLD ANSI_COLOR_BLUE "[Element %" PRIidx "] " ANSI_COLOR_RESET, i+1);
-        scanf("%" SCNint, &arr[i]);
+    for(siz i = 0;i < size;i++){
+        pblue(ANSI_FONT_BOLD ANSI_COLOR_BLUE "[Element %" Psiz "] " ANSI_COLOR_RESET, i+1);
+        scanf("%" Si64, &arr[i]);
     }
     return arr;
 }
 
-void arr_print(mint *arr, midx n){
+void arr_print(i64 *arr, siz n){
     printf("{ ");
     if(n == 0){
         printf("Empty }");
         return;
     }
-    printf("%" PRIint, arr[0]);
-    for(midx i = 1;i < n;i++)
-        printf(", %" PRIint, arr[i]);
+    printf("%" Pi64, arr[0]);
+    for(siz i = 1;i < n;i++)
+        printf(", %" Pi64, arr[i]);
     printf(" }");
 }
 
-mint* arr_copy(mint *source, midx n){
-    mint *dest = arr_new(n);
-    memcpy(dest, source, sizeof(mint) * n);
+i64* arr_copy(i64 *source, siz n){
+    i64 *dest = arr_new(n);
+    memcpy(dest, source, sizeof(i64) * n);
     return dest;
 }
 
-static mint test_arr_fill(mint *arr){
+static i64 test_arr_fill(i64 *arr){
     arr_fill_int(arr, 2, 2, 3);
     if(arr[1] != 3){
         return 0;
@@ -112,32 +112,33 @@ static mint test_arr_fill(mint *arr){
     return 1;
 }
 
-static mint test_random_at_most(){
-    for(mint i = 0;i < 1000;i++)
+static i64 test_random_at_most(){
+    for(i64 i = 0;i < 1000;i++)
         if(random_at_most(100) > 100)
             return 0;
-    for(mint i = 0;i < random_at_most(1000);i++){
-        mint range = random_at_most(93828);
+    for(i64 i = 0;i < random_at_most(1000);i++){
+        i64 range = random_at_most(93828);
         if(random_at_most(range) > range)
             return 0;
     }
     return 1;
 }
 
-static mint test_arr_copy(mint *source, midx n){
+static i64 test_arr_copy(i64 *source, siz n){
     arr_fill_rand(source, 10, 100, SAMPLE_CASE_AVERAGE);
-    mint *dest = arr_copy(source, n);
-    for(midx i = 0;i < n;i++)
+    i64 *dest = arr_copy(source, n);
+    for(siz i = 0;i < n;i++){
         if(source[i] != dest[i]){
             arr_free(dest);
             return 0;
         }
+    }
     arr_free(dest);
     return 1;
 }
 
 void test_arr(){
-    mint *arr = arr_new(10);
+    i64 *arr = arr_new(10);
     TEST("Array Create", arr);
     TEST("Array Fill", test_arr_fill(arr));
     TEST("Array Copy", test_arr_copy(arr, 10));

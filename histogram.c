@@ -8,7 +8,7 @@
 #include "utils.h"
 
 typedef struct{
-    midx index;
+    siz index;
     const char* color;
 } CustomColor;
 
@@ -18,10 +18,10 @@ void histo_set_title(const char *tie){
     title[0] = tie;
 }
 
-static Tuple find_max_min(mint *arr, midx n){
-    mint min = arr[0];
-    mint max = arr[0];
-    for(midx i = 1;i < n;i++){
+static Tuple find_max_min(i64 *arr, siz n){
+    i64 min = arr[0];
+    i64 max = arr[0];
+    for(siz i = 1;i < n;i++){
         if(arr[i] > max)
             max = arr[i];
         else if(arr[i] < min)
@@ -33,14 +33,14 @@ static Tuple find_max_min(mint *arr, midx n){
 
 #define NUM_STEPS 30
 
-static mint lastMax = 0;
+static i64 lastMax = 0;
 
-void histo_draw(mint *arr, midx n, mint colorCount, ...){
+void histo_draw(i64 *arr, siz n, i64 colorCount, ...){
     CustomColor colors[colorCount];
     va_list args;
     va_start(args, colorCount);
-    for(mint i = 0;i < colorCount;i++){
-        colors[i].index = va_arg(args, midx);
+    for(i64 i = 0;i < colorCount;i++){
+        colors[i].index = va_arg(args, siz);
         colors[i].color = va_arg(args, const char*);
     }
     va_end(args);
@@ -52,7 +52,7 @@ void histo_draw(mint *arr, midx n, mint colorCount, ...){
     }
     double min = max_min.b - 1;
     double steps = (double)(max - min) / NUM_STEPS;
-    mint stepCount = 1, lastStepPrint = 1;
+    i64 stepCount = 1, lastStepPrint = 1;
     steps = !steps ? 1 : steps;
     if(strcmp(title[0], "SampleTitle"))
         printf(ANSI_FONT_BOLD "Histogram : %s\n\n" ANSI_COLOR_RESET, title[0]);
@@ -63,10 +63,10 @@ void histo_draw(mint *arr, midx n, mint colorCount, ...){
         }
         else
             printf("    ");
-        for(midx j = 0;j < n;j++){
+        for(siz j = 0;j < n;j++){
             if(arr[j] >= i){
                 if(colorCount > 0){
-                    for(mint k = 0;k < colorCount;k++){
+                    for(i64 k = 0;k < colorCount;k++){
                         if(colors[k].index == j){
                             printf(colors[k].color);
                             printf("    \u2584" ANSI_COLOR_RESET);
@@ -83,8 +83,8 @@ colorend:;
         printf("\n");
     }
     printf("\n    ");
-    for(midx i = 0;i < n;i++){
-        printf("%5" PRIint, arr[i]);
+    for(siz i = 0;i < n;i++){
+        printf("%5" Pi64, arr[i]);
     }
     //while(stepCount++ < 40)
         printf("\n");
