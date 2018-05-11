@@ -2,6 +2,10 @@
 
 #include <stdarg.h>
 
+#ifndef TEST_NAME_WIDTH
+#define TEST_NAME_WIDTH 50
+#endif
+
 void tst_pass();
 void tst_fail();
 void tst_start(const char *name);

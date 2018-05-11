@@ -8,14 +8,28 @@
 
 static clock_t start = 0, end = 0, elapsed = 0;
 
+static int test_header_pad = TEST_NAME_WIDTH / 2 + 4;
+
+static void header_underline(int linesize){
+    while(linesize--)
+        printf("=");
+}
+
 static void header(){
-    printf(ANSI_FONT_BOLD " Status              TestName               Time" ANSI_COLOR_RESET);
-    printf(ANSI_FONT_BOLD "\n======== =============================== ==========" ANSI_COLOR_RESET);
+    printf(ANSI_FONT_BOLD " Status   ");
+    printf("%*s%*s", test_header_pad, "TestName", (TEST_NAME_WIDTH - test_header_pad), " ");
+    printf("    Time\n");
+    header_underline(8);
+    printf(" ");
+    header_underline(TEST_NAME_WIDTH + 1);
+    printf(" ");
+    header_underline(10);
+    printf(ANSI_COLOR_RESET);
 }
 
 static void line_clear(){
     printf("\r");
-    for(siz i = 0;i < 80;i++)
+    for(siz i = 0;i < 100;i++)
         printf(" ");
 }
 
@@ -27,7 +41,7 @@ void tst_start(const char *name){
         header();
     paused = 0;
     pylw( ANSI_FONT_BOLD "\n[Running] " ANSI_COLOR_RESET);
-    printf(ANSI_FONT_BOLD "%-30s" ANSI_COLOR_RESET, name);
+    printf(ANSI_FONT_BOLD "%-*s" ANSI_COLOR_RESET, TEST_NAME_WIDTH, name);
     fflush(stdout);
     testName[0] = name;
     start = clock();
@@ -42,7 +56,7 @@ void tst_pass(){
         end = clock();
     line_clear();
     pgrn( ANSI_FONT_BOLD "\r[Passed] " ANSI_COLOR_RESET);
-    printf(ANSI_FONT_BOLD "%-30s" ANSI_COLOR_RESET "   %fs", testName[0], time_diff());
+    printf(ANSI_FONT_BOLD "%-*s" ANSI_COLOR_RESET "   %fs", TEST_NAME_WIDTH, testName[0], time_diff());
     fflush(stdout);
     elapsed = 0;
     start = end = 1;
@@ -53,7 +67,7 @@ void tst_fail(){
         end = clock();
     line_clear();
     pred( ANSI_FONT_BOLD "\r[Failed] " ANSI_COLOR_RESET);
-    printf(ANSI_FONT_BOLD "%-30s" ANSI_COLOR_RESET "   %fs", testName[0], time_diff());
+    printf(ANSI_FONT_BOLD "%-*s" ANSI_COLOR_RESET "   %fs", TEST_NAME_WIDTH, testName[0], time_diff());
     fflush(stdout);
     elapsed = 0;
     start = end = 1;
@@ -69,9 +83,9 @@ void tst_pause(const char *reason){
     line_clear();
     pylw(ANSI_FONT_BOLD "\r[Paused] " ANSI_COLOR_RESET);
     if(reason == NULL)
-        printf(ANSI_FONT_BOLD "%-30s" ANSI_COLOR_RESET, testName[0]);
+        printf(ANSI_FONT_BOLD "%-*s" ANSI_COLOR_RESET, TEST_NAME_WIDTH, testName[0]);
     else
-        printf( ANSI_FONT_BOLD "%-30s : %s" ANSI_COLOR_RESET, testName[0], reason);
+        printf( ANSI_FONT_BOLD "%-*s : %s" ANSI_COLOR_RESET, TEST_NAME_WIDTH, testName[0], reason);
     fflush(stdout);
 }
 
@@ -88,9 +102,9 @@ void tst_resume(const char *status){
     line_clear();
     pylw( ANSI_FONT_BOLD "\r[Running] " ANSI_COLOR_RESET);
     if(status)
-        printf(ANSI_FONT_BOLD "%-30s : %s" ANSI_COLOR_RESET, testName[0], status);
+        printf(ANSI_FONT_BOLD "%-*s : %s" ANSI_COLOR_RESET, TEST_NAME_WIDTH, testName[0], status);
     else
-        printf(ANSI_FONT_BOLD "%-30s" ANSI_COLOR_RESET, testName[0]);
+        printf(ANSI_FONT_BOLD "%-*s" ANSI_COLOR_RESET, TEST_NAME_WIDTH, testName[0]);
     fflush(stdout);
     start = clock(); 
 }
