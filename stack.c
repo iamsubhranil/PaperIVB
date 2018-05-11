@@ -5,6 +5,23 @@
 #include "arr.h"
 #include "utils.h"
 
+// Core data structure
+// ===================
+
+typedef struct Stack_Intr{
+    union{
+        mint *values;
+        void **genericValues;
+    };
+    union{
+        mint *top;
+        void **genericTop;
+    };
+    midx count;
+    mints grow;
+    mints status; // 0-> Normal, 1-> Overflow, 2-> Underflow
+} Stack_Intr;
+
 // Type agnostic API
 // =================
 

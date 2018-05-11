@@ -2,21 +2,7 @@
 
 #include "common.h"
 
-typedef struct{
-    union{
-        mint *values;
-        void **genericValues;
-    };
-    union{
-        mint *top;
-        void **genericTop;
-    };
-    midx count;
-    mints grow;
-    mints status; // 0-> Normal, 1-> Overflow, 2-> Underflow
-} Stack_Intr;
-
-typedef Stack_Intr* Stack;
+typedef struct Stack_Intr* Stack;
 
 // `grow` indicates whether the stack is
 // permitted to grow dynamically at runtime.
