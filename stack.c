@@ -12,10 +12,12 @@ typedef struct Stack_Intr{
     union{
         i64 *values;
         void **genericValues;
+        u8 *boolValues;
     };
     union{
         i64 *top;
         void **genericTop;
+        u8 *boolTop;
     };
     siz count;
     u8 grow;
@@ -190,6 +192,14 @@ stk_api(new_generic, push_generic, push_fast_generic,
         pop_generic, pop_fast_generic, free_generic,
         size_generic, genericValues, genericTop, void*, rand_void)
 
+static u8 rand_bool(){
+    return random_at_most(1);
+}
+
+stk_api(new_bool, push_bool, push_fast_bool, 
+        pop_bool, pop_fast_bool, free_bool,
+        size_bool, boolValues, boolTop, u8, rand_bool)
+
 #undef stk_api
 
 // Tests
@@ -213,6 +223,8 @@ void test_stack(){
     stk_tst(Integer, new, push, push_fast, pop, pop_fast, size, free);
     stk_tst(Generic, new_generic, push_generic, push_fast_generic, pop_generic, pop_fast_generic,
             size_generic, free_generic);
+    stk_tst(Boolean, new_bool, push_bool, push_fast_bool, pop_bool, pop_fast_bool,
+            size_bool, free_bool);
 
 #undef stk_tst
 }

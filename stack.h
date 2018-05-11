@@ -11,9 +11,11 @@ typedef struct Stack_Intr* Stack;
 // and the overflow flag will be set.
 Stack stack_new(siz count, u8 grow);
 Stack stack_new_generic(siz count, u8 grow);
+Stack stack_new_bool(siz count, u8 grow);
 
 void stack_free(Stack stack);
 void stack_free_generic(Stack stack);
+void stack_free_bool(Stack stack);
 
 // No overflow check and/or stack expansion,
 // use only when 200% sure about the state
@@ -22,20 +24,24 @@ void stack_free_generic(Stack stack);
 // the minimum.
 void stack_push_fast(Stack stack, i64 value);
 void stack_push_fast_generic(Stack stack, void *value);
+void stack_push_fast_bool(Stack stack, u8 value);
 
 // Slower, safer push, with full overflow check
 // and stack expansion support.
 void stack_push(Stack stack, i64 value);
 void stack_push_generic(Stack stack, void *value);
+void stack_push_bool(Stack stack, u8 value);
 
 // No underflow check, same cautions applicable
 // as stack_push_fast
 i64 stack_pop_fast(Stack stack);
 void* stack_pop_fast_generic(Stack stack);
+u8 stack_pop_fast_bool(Stack stack);
 
 // Slower, safer pop, with full underflow check
 i64 stack_pop(Stack stack);
 void* stack_pop_generic(Stack stack);
+u8 stack_pop_bool(Stack stack);
 
 
 // Stack status query
@@ -44,5 +50,6 @@ u8 stack_is_overflow(Stack stack);
 u8 stack_is_underflow(Stack stack);
 i64 stack_size(Stack stack);
 i64 stack_size_generic(Stack stack);
+i64 stack_size_bool(Stack stack);
 
 void test_stack();
