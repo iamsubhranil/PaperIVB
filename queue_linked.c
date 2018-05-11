@@ -4,11 +4,6 @@
 
 #ifdef QUEUE_ENABLE_LINK
 
-typedef struct LinkedNode{
-    i64 val;
-    struct LinkedNode *next;
-} LinkedNode;
-
 typedef struct LinkedQueue{
     LinkedNode *rear;
     LinkedNode *front;
