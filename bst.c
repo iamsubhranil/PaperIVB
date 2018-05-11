@@ -6,7 +6,7 @@
 #include "utils.h"
 #include "sort.h"
 #include "stack.h"
-
+#include "display.h"
 
 typedef struct BST{
     i64 value;
@@ -22,11 +22,11 @@ static BST* bst_new_node(){
     return node;
 }
 
-void bst_insert(BST *bst, i64 value){
+u8 bst_insert(BST *bst, i64 value){
     BST *tmp = bst, *prev = bst;
     while(tmp != NULL){
-        //if(value == tmp->value)
-        //    return 0;
+        if(value == tmp->value)
+            return 0;
         prev = tmp;
         if(value > tmp->value)
             tmp = tmp->right;
@@ -41,6 +41,7 @@ void bst_insert(BST *bst, i64 value){
         prev->left = bst_new_node();
         prev->left->value = value;
     }
+    return 1;
 }
 
 BST *bst_create(i64 *arr, siz n){
@@ -49,6 +50,96 @@ BST *bst_create(i64 *arr, siz n){
     for(siz i = 1;i < n;i++)
         bst_insert(root, arr[i]);
     return root;
+}
+
+i64 bst_count_nodes(BST *bst){
+    if(bst == NULL)
+        return 0;
+    return bst_count_nodes(bst->left) + bst_count_nodes(bst->right) + 1;
+}
+
+BST* inorder_successor(BST *root, BST *ptr){
+    if(ptr->right){
+        ptr = ptr->right;
+        while(ptr->left != NULL)
+            ptr = ptr->left;
+        return ptr;
+    }
+    BST *suc = NULL;
+    while(root){
+        if(root->value > ptr->value){
+            suc = root;
+            root = root->left;
+        }
+        else if(root->value < ptr->value)
+            root = root->right;
+        else
+            break;
+    }
+    return suc;
+}
+
+u8 bst_delete(BST **root, i64 val){
+    //bst_print(*root);
+    u8 found = 0;
+    BST *ptr = *root, *prev = NULL;
+    while(ptr){
+        if(ptr->value == val){
+            found = 1;
+            break;
+        }
+        prev = ptr;
+        if(ptr->value < val)
+            ptr = ptr->right;
+        else
+            ptr = ptr->left;
+    }
+    if(!found)
+        return 0;
+
+    u8 delete_type = 0;
+    if(!ptr->left && !ptr->right)
+        delete_type = 1;
+    else if(ptr->left && ptr->right)
+        delete_type = 3;
+    else
+        delete_type = 2;
+
+    switch(delete_type){
+        case 1:
+            {
+                if(prev == NULL)
+                    *root = NULL;
+                else if(prev->right == ptr)
+                    prev->right = NULL;
+                else
+                    prev->left = NULL;
+                free(ptr);
+            }
+            break;
+        case 2:
+            {
+                BST *child = ptr->left == NULL ?
+                    ptr->right : ptr->left;
+                if(prev == NULL)
+                    *root = child;
+                else if(prev->left == ptr)
+                    prev->left = child;
+                else
+                    prev->right = child;
+                free(ptr);
+            }
+            break;
+        case 3:
+            {
+                BST *insuc = inorder_successor(*root, ptr);
+                i64 val1 = insuc->value;
+                bst_delete(root, val1);
+                ptr->value = val1;
+            }
+            break;
+    }
+    return 1;
 }
 
 void bst_free(BST *bst){
@@ -143,7 +234,44 @@ void bst_postorder_nonrec(BST *bst, bst_process process){
         }
     } while(!stack_is_empty(s) || ptr != NULL);
     stack_free_generic(s);
-    stack_free_bool(s);
+    stack_free_bool(b);
+}
+
+static void bst_print2(BST *bst, u8 indent, const char *side){
+    for(u8 j = 0;j < 2;j++){
+        pblue("\n");
+        for(u8 i = 1;i <= indent;i++){
+            if(i % 5 == 0)
+                pblue("|");
+            else
+                pblue(" ");
+        }
+    }
+    if(indent > 0){
+        pblue("- %s : ", side);
+        if(bst != NULL){
+            pgrn("%" Pi64, bst->value);
+            bst_print2(bst->left, indent + 5, "Left");
+            bst_print2(bst->right, indent + 5, "Right");
+        }
+        else
+            pred("Null");
+    }
+    else{
+        pcyn("Root : ");
+        if(bst){
+            pgrn("%" Pi64, bst->value);
+            bst_print2(bst->left, indent + 5, "Left");
+            bst_print2(bst->right, indent + 5, "Right");
+        }
+        else
+            pred("Null");
+    }
+    
+}
+
+void bst_print(BST *bst){
+    bst_print2(bst, 0, "none");
 }
 
 static BST *bst_test_gen;
@@ -151,7 +279,7 @@ static BST *bst_test_gen;
 static i64 test_bst_create(siz n){
     tst_pause("Generating random elements");
     i64 *arr = arr_new(n);
-    arr_fill_rand(arr, n, random_at_most(n), SAMPLE_CASE_AVERAGE);
+    arr_fill_rand(arr, n, 100000, SAMPLE_CASE_AVERAGE);
     tst_resume("Creating BST");
     BST *bst = bst_create(arr, n);
     tst_resume("Cleaning up");
@@ -177,6 +305,36 @@ static i64 test_bst_insert(BST *bst, i64 value){
     return 1;
 }
 
+static i64 test_bst_delete(BST **bst1){
+   // BST *bst = *bst1;
+    i64 rootval = (*bst1)->value;
+    bst_delete(bst1, rootval);
+    if((*bst1)->value == rootval)
+        return 0;
+    BST *ptr = *bst1;
+    while(ptr->left && ptr->right)
+        ptr = ptr->left;
+    rootval = ptr->value;
+    if(!bst_delete(bst1, rootval))
+        return 0;
+    ptr = *bst1;
+    while(ptr->left || ptr->right){
+        if(ptr->right)
+            ptr = ptr->right;
+        else
+            ptr = ptr->left;
+    }
+    rootval = ptr->value;
+    if(!bst_delete(bst1, rootval))
+        return 0;
+    while((*bst1)->left || (*bst1)->right)
+        if(!bst_delete(bst1, (*bst1)->value))
+            return 0;
+    if((*bst1)->left || (*bst1)->right)
+        return 0;
+    return 1;
+}
+
 static i64 *bst_test_array;
 static siz bst_test_pointer = 0;
 
@@ -190,12 +348,12 @@ static i64 test_bst_##ordername(){ \
     bst_test_pointer = 0; \
     if(bst_test_array == NULL) \
         bst_test_array = arr_new(BST_TEST_ITEM_COUNT); \
-    arr_fill_rand(bst_test_array, 10, 20003, SAMPLE_CASE_AVERAGE); \
+    arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 20003, SAMPLE_CASE_AVERAGE); \
     i64 *bst_input_array = arr_new(BST_TEST_ITEM_COUNT); \
     arr_fill_rand(bst_input_array, BST_TEST_ITEM_COUNT, 898213, SAMPLE_CASE_##input_order); \
     BST  *bst = bst_create(bst_input_array, BST_TEST_ITEM_COUNT); \
     bst_##ordername(bst, test_bst_order_process); \
-    i64 ret = check_sort(bst_test_array, BST_TEST_ITEM_COUNT, SORT_TYPE_##output_order); \
+    i64 ret = check_sort(bst_test_array, bst_count_nodes(bst), SORT_TYPE_##output_order); \
     free(bst_input_array); \
     bst_free(bst); \
     return ret;  \
@@ -214,8 +372,9 @@ bst_order_test(postorder_nonrec, WORST, ASCENDING)
 void test_bst(){
     TEST("Binary Search Tree Creation", test_bst_create(BST_TEST_ITEM_COUNT));
     BST *bst = bst_test_gen;
-    TEST("Binary Search Tree Searching", bst_search(bst, bst->left->value));
+    TEST("Binary Search Tree Searching", bst_search(bst, bst->value));
     TEST("Binary Search Tree Insertion", test_bst_insert(bst, random_at_most(BST_TEST_ITEM_COUNT)));
+    TEST("Binary Search Tree Deletion", test_bst_delete(&bst));
     bst_free(bst);
     TEST("Binary Search Tree Preorder", test_bst_preorder());
     TEST("Binary Search Tree Preorder Non Recursive", test_bst_preorder_nonrec());
