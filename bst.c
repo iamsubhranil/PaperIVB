@@ -379,7 +379,7 @@ void test_bst(){
     TEST("Binary Search Tree Preorder", test_bst_preorder());
     TEST("Binary Search Tree Preorder Non Recursive", test_bst_preorder_nonrec());
     TEST("Binary Search Tree Inorder", test_bst_inorder());
-    TEST("Binary Search Tree Inorder NR", test_bst_inorder_nonrec());
+    TEST("Binary Search Tree Inorder Non Recursive", test_bst_inorder_nonrec());
     TEST("Binary Search Tree Postorder", test_bst_postorder());
-    TEST("Binary Search Tree Postorder NR", test_bst_postorder_nonrec());
+    TEST("Binary Search Tree Postorder Non Recursive", test_bst_postorder_nonrec());
 }
