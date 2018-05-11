@@ -22,7 +22,7 @@ static BST* bst_new_node(){
     return node;
 }
 
-i64 bst_insert(BST *bst, i64 value){
+void bst_insert(BST *bst, i64 value){
     BST *tmp = bst, *prev = bst;
     while(tmp != NULL){
         //if(value == tmp->value)
@@ -41,7 +41,6 @@ i64 bst_insert(BST *bst, i64 value){
         prev->left = bst_new_node();
         prev->left->value = value;
     }
-    return 1;
 }
 
 BST *bst_create(i64 *arr, siz n){
@@ -60,7 +59,7 @@ void bst_free(BST *bst){
     free(bst);
 }
 
-i64 bst_search(BST *bst, i64 value){
+u8 bst_search(BST *bst, i64 value){
     for(BST *tmp = bst;tmp != NULL;tmp = value > tmp->value ? tmp->right : tmp->left)
         if(tmp->value == value)
             return 1;

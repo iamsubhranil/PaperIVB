@@ -11,11 +11,11 @@ typedef struct BST* BinarySearchTree;
 BinarySearchTree bst_create(i64 *arr, siz n);
 void bst_free(BinarySearchTree bst);
 
-i64 bst_insert(BinarySearchTree bst, i64 value);
+void bst_insert(BinarySearchTree bst, i64 value);
 
-i64 bst_search(BinarySearchTree bst, i64 value);
+u8 bst_search(BinarySearchTree bst, i64 value);
 
-i64 bst_delete(BinarySearchTree bst, i64 value);
+u8 bst_delete(BinarySearchTree bst, i64 value);
 
 typedef void(*bst_process)(i64);
 
