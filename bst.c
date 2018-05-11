@@ -75,6 +75,22 @@ void bst_preorder(BST *bst, bst_process process){
     bst_preorder(bst->right, process);
 }
 
+void bst_preorder_nonrec(BST *bst, bst_process process){
+    BST *ptr = bst;
+    Stack s = stack_new_generic(1, 1);
+    stack_push_generic(s, ptr);
+    while(!stack_is_empty(s)){
+        BST *cur = (BST *)stack_pop_generic(s);
+        process(cur->value);
+
+        if(cur->right)
+            stack_push_generic(s, cur->right);
+        if(cur->left)
+            stack_push_generic(s, cur->left);
+    }
+    stack_free_generic(s);
+}
+
 void bst_inorder(BST *bst, bst_process process){
     if(bst == NULL)
         return;
@@ -104,6 +120,31 @@ void bst_postorder(BST *bst, bst_process process){
     bst_postorder(bst->left, process);
     bst_postorder(bst->right, process);
     process(bst->value);
+}
+
+void bst_postorder_nonrec(BST *bst, bst_process process){
+    BST *ptr = bst;
+    Stack s = stack_new_generic(1, 1);
+    Stack b = stack_new_bool(1, 1);
+    do{
+        while(ptr != NULL){
+            stack_push_generic(s, ptr);
+            stack_push_bool(b, 0);
+            ptr = ptr->left;
+        }
+        u8 already_seen = stack_pop_bool(b);
+        BST *cur = (BST *)stack_pop_generic(s);
+        if(already_seen){
+            process(cur->value);
+        }
+        else{
+            stack_push_bool(b, 1);
+            stack_push_generic(s, cur);
+            cur = cur->right;
+        }
+    } while(!stack_is_empty(s) || ptr != NULL);
+    stack_free_generic(s);
+    stack_free_bool(s);
 }
 
 static BST *bst_test_gen;
@@ -148,21 +189,25 @@ static void test_bst_order_process(i64 value){
 #define bst_order_test(ordername, input_order, output_order) \
 static i64 test_bst_##ordername(){ \
     bst_test_pointer = 0; \
-    bst_test_array = arr_new(BST_TEST_ITEM_COUNT); \
-    arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 898213, SAMPLE_CASE_##input_order); \
-    BST  *bst = bst_create(bst_test_array, BST_TEST_ITEM_COUNT); \
+    if(bst_test_array == NULL) \
+        bst_test_array = arr_new(BST_TEST_ITEM_COUNT); \
+    arr_fill_rand(bst_test_array, 10, 20003, SAMPLE_CASE_AVERAGE); \
+    i64 *bst_input_array = arr_new(BST_TEST_ITEM_COUNT); \
+    arr_fill_rand(bst_input_array, BST_TEST_ITEM_COUNT, 898213, SAMPLE_CASE_##input_order); \
+    BST  *bst = bst_create(bst_input_array, BST_TEST_ITEM_COUNT); \
     bst_##ordername(bst, test_bst_order_process); \
     i64 ret = check_sort(bst_test_array, BST_TEST_ITEM_COUNT, SORT_TYPE_##output_order); \
-    free(bst_test_array); \
-    bst_test_pointer = 0; \
+    free(bst_input_array); \
     bst_free(bst); \
     return ret;  \
 }
 
 bst_order_test(inorder, AVERAGE, ASCENDING)
 bst_order_test(inorder_nonrec, AVERAGE, ASCENDING)
-bst_order_test(preorder, BEST, ASCENDING)
+bst_order_test(preorder, WORST, DESCENDING)
+bst_order_test(preorder_nonrec, WORST, DESCENDING)
 bst_order_test(postorder, WORST, ASCENDING)
+bst_order_test(postorder_nonrec, WORST, ASCENDING)
 
 
 #undef bst_order_test
@@ -174,7 +219,9 @@ void test_bst(){
     TEST("Binary Search Tree Insertion", test_bst_insert(bst, random_at_most(BST_TEST_ITEM_COUNT)));
     bst_free(bst);
     TEST("Binary Search Tree Preorder", test_bst_preorder());
+    TEST("Binary Search Tree Preorder Non Recursive", test_bst_preorder_nonrec());
     TEST("Binary Search Tree Inorder", test_bst_inorder());
     TEST("Binary Search Tree Inorder NR", test_bst_inorder_nonrec());
     TEST("Binary Search Tree Postorder", test_bst_postorder());
+    TEST("Binary Search Tree Postorder NR", test_bst_postorder_nonrec());
 }
