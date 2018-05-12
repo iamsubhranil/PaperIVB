@@ -8,12 +8,6 @@
 #include "stack.h"
 #include "display.h"
 
-typedef struct BST{
-    i64 value;
-    struct BST *left;
-    struct BST *right;
-} BST;
-
 static BST* bst_new_node(){
     BST *node = (BST *)malloc(sizeof(BST));
     node->left = NULL;
@@ -72,6 +66,16 @@ i64 bst_count_internal(BST *bst){
     if(bst->left || bst->right)
         return bst_count_internal(bst->right) + bst_count_internal(bst->left) + 1;
     return 0;
+}
+
+i64 bst_find_height(BST *bst){
+    if(bst == NULL)
+        return 0;
+    if(!bst->left && !bst->right)
+        return 0;
+    i64 lh = bst_find_height(bst->left);
+    i64 rh = bst_find_height(bst->right);
+    return (lh > rh ? lh : rh) + 1;
 }
 
 BST* inorder_successor(BST *root, BST *ptr){
@@ -398,8 +402,18 @@ bst_count_test(leaves, WORST, 1)
 
 #undef bst_count_test
 
+static i64 test_bst_find_height(){
+    arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 889201, SAMPLE_CASE_BEST);
+    BST *bst = bst_create(bst_test_array, BST_TEST_ITEM_COUNT);
+    i64 ret = 1;
+    if(bst_find_height(bst) != BST_TEST_ITEM_COUNT - 1)
+        ret = 0;
+    bst_free(bst);
+    return ret;
+}
+
 void test_bst(){
-    tst_suite_start("Binary Search Tree", 13);
+    tst_suite_start("Binary Search Tree", 14);
     TEST("Creation", test_bst_create(BST_TEST_ITEM_COUNT));
     BST *bst = bst_test_gen;
     TEST("Searching", bst_search(bst, bst->value));
@@ -410,6 +424,7 @@ void test_bst(){
     TEST("Total Node Count", test_bst_count_nodes());
     TEST("Internal Node Count", test_bst_count_internal());
     TEST("Leaf Node Count", test_bst_count_leaves());
+    TEST("Height", test_bst_find_height());
     TEST("Preorder", test_bst_preorder());
     TEST("Preorder Non Recursive", test_bst_preorder_nonrec());
     TEST("Inorder", test_bst_inorder());

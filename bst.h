@@ -6,6 +6,12 @@
 #define BST_TEST_ITEM_COUNT 10000
 #endif
 
+typedef struct BST{
+    i64 value;
+    struct BST *left;
+    struct BST *right;
+} BST;
+
 typedef struct BST* BinarySearchTree;
 
 BinarySearchTree bst_create(i64 *arr, siz n);
