@@ -31,9 +31,14 @@ target_link_libraries(bst   test
                             array
                             utils)
 
+add_library(ht SHARED hashtable.c)
+target_link_libraries(ht    test
+                            utils)
+
 add_executable(paperivb main.c)
 target_link_libraries(paperivb sort
                                 bst
-                                queue)
+                                queue
+                                ht)
 
 add_definitions(-DSORT_ENABLE_TEST_ALL -DSORT_TEST_ITEM_COUNT=100000 -DBST_TEST_ITEM_COUNT=100000)
