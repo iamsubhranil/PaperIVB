@@ -5,7 +5,7 @@
 #include "common.h"
 
 #ifndef TEST_NAME_WIDTH
-#define TEST_NAME_WIDTH 25
+#define TEST_NAME_WIDTH 35
 #endif
 
 void tst_pass();

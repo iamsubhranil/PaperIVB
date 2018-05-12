@@ -6,10 +6,13 @@
 #include "display.h"
 
 static clock_t start = 0, end = 0, elapsed = 0;
+double suite_total_time = 0;
 
 static u8 header_shown = 0;
 
 static int test_header_pad = (TEST_NAME_WIDTH / 2) - 4, total_width = TEST_NAME_WIDTH + 11;
+
+static const char *str_pass = "\u2714", *str_fail = "\u2718", *str_clock = "\u25d5";
 
 static void header_underline(int linesize){
     while(linesize--)
@@ -37,30 +40,36 @@ static void line_clear(){
 
 static const char *testName[] = {"SampleTest"};
 static i64 paused = 0;
-static u64 test_count = 0, done_tests = 1, global_done_tests = 1;
+static u64 suite_test_count = 0, suite_tests_done = 1, global_suite_tests_done = 1;
+static u64 suite_tests_passed = 0, suite_tests_failed = 0;
 
-static void print_test_count(){
-    if(test_count >= done_tests){
-        pcyn("\r%3" Pu64 "/%-3" Pu64 " ", done_tests, test_count);
+static void print_suite_test_count(){
+    if(suite_test_count >= suite_tests_done){
+        pcyn("\r%3" Pu64 "/%-3" Pu64 " ", suite_tests_done, suite_test_count);
     }
     else
-        pylw(ANSI_FONT_BOLD "\r%6" Pu64 "  ", global_done_tests);
+        pylw(ANSI_FONT_BOLD "\r%6" Pu64 "  ", global_suite_tests_done);
 }
 
-static void test_count_incr(){
-    if(test_count >= done_tests)
-        done_tests++;
+static void suite_test_count_incr(u8 passed){
+    if(suite_test_count >= suite_tests_done){
+        suite_tests_done++;
+        if(passed)
+            suite_tests_passed++;
+        else
+            suite_tests_failed++;
+    }
     else
-        global_done_tests++;
+        global_suite_tests_done++;
 }
 
 void tst_suite_start(const char *name, u64 count){
     if(!paused && start == 0)
         header();
-    test_count = 0;
+    suite_test_count = 0;
     pblue("\n");
-    print_test_count();
-    test_count = count;
+    print_suite_test_count();
+    suite_test_count = count;
 
     siz s = strlen(name);
     int left = (total_width / 2) - (s / 2) - 1;
@@ -79,21 +88,30 @@ void tst_suite_start(const char *name, u64 count){
 }
 
 void tst_suite_end(){
-    test_count = 0;
-    done_tests = 1;
-    int s = 0;
+    u64 bak = suite_test_count;
+    suite_test_count = 0;
+    suite_tests_done = 1;
+    int gap = total_width < 30 ? 1 : (total_width - 31) / 2;
     pblue("\n");
-    print_test_count();
-    while(s++ < total_width)
+    print_suite_test_count();
+    printf(ANSI_FONT_BOLD "= ");
+    pgrn(ANSI_FONT_BOLD "%s %2" Pu64 "/%-2" Pu64 " ", str_pass, suite_tests_passed, bak);
+    for(int i = 0;i < gap;i++)
         printf(ANSI_FONT_BOLD "=");
-    test_count_incr();
+    pred(ANSI_FONT_BOLD " %s %2" Pu64 "/%-2" Pu64 " ", str_fail, suite_tests_failed, bak);
+    for(int i = 0;i < gap;i++)
+        printf(ANSI_FONT_BOLD "=");
+    pylw(ANSI_FONT_BOLD " %s ", str_clock);
+    printf(ANSI_FONT_BOLD "%3.6f =", suite_total_time);
+    suite_test_count_incr(0);
+    suite_tests_failed = suite_tests_passed = suite_total_time = 0;
 }
 
 void tst_start(const char *name){
     if(!header_shown)
         header();
     pblue("\n");
-    print_test_count();
+    print_suite_test_count();
     paused = 0;
     pylw(ANSI_FONT_BOLD "\u25d5 ");
     printf(ANSI_FONT_BOLD "%-*s" ANSI_COLOR_RESET, TEST_NAME_WIDTH, name);
@@ -110,11 +128,13 @@ void tst_pass(){
     if(!paused)
         end = clock();
     line_clear();
-    print_test_count();
+    print_suite_test_count();
     pgrn( "\u2714 " ANSI_COLOR_RESET);
     printf( "%-*s" ANSI_COLOR_RESET "%2.6fs", TEST_NAME_WIDTH, testName[0], time_diff());
     fflush(stdout);
-    test_count_incr();
+    if(suite_test_count >= suite_tests_done)
+        suite_total_time += time_diff();
+    suite_test_count_incr(1);
     elapsed = 0;
     start = end = 1;
 }
@@ -123,11 +143,13 @@ void tst_fail(){
     if(!paused)
         end = clock();
     line_clear();
-    print_test_count();
+    print_suite_test_count();
     pred( ANSI_FONT_BOLD "\u2718 " ANSI_COLOR_RESET);
     printf(ANSI_FONT_BOLD "%-*s" ANSI_COLOR_RESET "%2.6fs", TEST_NAME_WIDTH, testName[0], time_diff());
     fflush(stdout);
-    test_count_incr();
+    if(suite_test_count >= suite_tests_done)
+        suite_total_time += time_diff();
+    suite_test_count_incr(0);
     elapsed = 0;
     start = end = 1;
 }
@@ -140,8 +162,8 @@ void tst_pause(const char *reason){
         paused = 1;
     }
     line_clear();
-    print_test_count();
-    pylw(ANSI_FONT_BOLD "\u27d1 " ANSI_COLOR_RESET);
+    print_suite_test_count();
+    pylw(ANSI_FONT_BOLD "\u27a1 " ANSI_COLOR_RESET);
     if(reason == NULL)
         printf(ANSI_FONT_BOLD "%-*s" ANSI_COLOR_RESET, TEST_NAME_WIDTH, testName[0]);
     else
@@ -160,7 +182,7 @@ void tst_resume(const char *status){
     else
         paused = 0;
     line_clear();
-    print_test_count();
+    print_suite_test_count();
     pylw( ANSI_FONT_BOLD "\u25d5 " ANSI_COLOR_RESET);
     if(status)
         printf(ANSI_FONT_BOLD "%-*s : %s" ANSI_COLOR_RESET, TEST_NAME_WIDTH, testName[0], status);
