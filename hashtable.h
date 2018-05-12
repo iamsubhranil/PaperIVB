@@ -4,6 +4,10 @@
 
 typedef struct HT* HashTable;
 
+#ifndef HASHTABLE_TEST_ITEM_COUNT
+#define HASHTABLE_TEST_ITEM_COUNT 10000
+#endif
+
 typedef enum{
     HF_DIVISION,
     HF_MIDSQUARE,

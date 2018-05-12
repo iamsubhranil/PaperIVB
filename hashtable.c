@@ -4,6 +4,7 @@
 #include "hashtable.h"
 #include "utils.h"
 #include "test.h"
+#include "arr.h"
 
 typedef enum{
     TABLE_OPEN,
@@ -31,14 +32,15 @@ typedef struct HT{
 } HT;
 
 static siz hf_division(siz table_size, i64 value){
-    return value % table_size;
+    value = value - ((value / table_size) * table_size);
+    return value;
 }
 
 static siz hf_midsq(siz table_size, i64 value){
     i64 sq = value * value;
     i64 d = 1, res = 0;
     while(sq > 0){
-        i64 dig = sq % 10;
+        i64 dig = sq - ((sq / 10) * 10);
         res *= 10;
         res += dig;
         d *= 100;
@@ -48,7 +50,7 @@ static siz hf_midsq(siz table_size, i64 value){
 }
 
 static i64 rev_two_dig(i64 input){
-    i64 dig1 = input % 10;
+    i64 dig1 = input - ((input / 10) * 10);
     i64 dig2 = input / 10;
     return dig1 * 10 + dig2;
 }
@@ -58,7 +60,7 @@ static siz hf_folding(siz table_size, i64 value){
     u8 flag = 0;
     // Fold shifting
     while(value > 0){
-        i64 two = value % 100;
+        i64 two = value - ((value / 100) * 100);
         if(flag){
             res += rev_two_dig(two);
             flag = 0;
@@ -75,7 +77,7 @@ static siz hf_folding(siz table_size, i64 value){
 static siz hp_linear(HT *table, siz gen_index){
     siz orig = gen_index;
     while(table->used[gen_index]){
-        gen_index = (gen_index + 1) % table->table_size;
+        gen_index = (gen_index + 1) == table->table_size ? 0 : (gen_index + 1);
         if(orig == gen_index)
             return orig;
     }
@@ -86,7 +88,10 @@ static siz hp_quadratic(HT *table, siz gen_index){
     siz orig = gen_index;
     i64 i = 1;
     while(table->used[gen_index]){
-        gen_index = (orig + (i*i)) % table->table_size;
+        gen_index = (orig + (i*i));
+        while(gen_index >= table->table_size)
+            gen_index -= table->table_size;
+
         if(orig == gen_index)
             return orig;
         i++;
@@ -197,16 +202,13 @@ void hashtable_set_hashfunction(HT *ht, hash_function fun){
 static u8 hashtable_search_closed(HT *ht, i64 value){
     siz orig = ht->func(ht->table_size, value);
     siz idx = orig;
-    while(ht->used[idx]){
-        if(ht->table[idx] == value)
+    while(1){
+        if(ht->used[idx] && ht->table[idx] == value)
             return 1;
-        idx = (idx + 1) % ht->table_size;
-        while(!ht->used[idx])
-            idx++;
+        idx = (idx + 1) == ht->table_size ? 0 : (idx + 1);
         if(idx == orig)
             return 0;
     }
-    return 0;
 }
 
 static u8 hashtable_insert_closed(HT *ht, i64 value){
@@ -276,9 +278,9 @@ void hashtable_free(HT *ht){
 static HT *test_closed_ht;
 
 static u8 test_hashtable_create_closed(){
-    test_closed_ht = hashtable_create_closed(100, HF_MIDSQUARE, PROBE_LINEAR);
+    test_closed_ht = hashtable_create_closed(HASHTABLE_TEST_ITEM_COUNT, HF_MIDSQUARE, PROBE_LINEAR);
     u8 ret = test_closed_ht ? 1 : 0;
-    if(test_closed_ht->table_size != 100)
+    if(test_closed_ht->table_size != HASHTABLE_TEST_ITEM_COUNT)
         ret &= 0;
     if(test_closed_ht->func != hf_midsq)
         ret &= 0;
@@ -289,12 +291,13 @@ static u8 test_hashtable_create_closed(){
 }
 
 static u8 test_hashtable_search(HT *ht){
+    memset(ht->used, 0, sizeof(u8) * ht->table_size);
+    if(hashtable_search(ht, random_at_most(rand())))
+        return 0;
     i64 random = random_at_most(5892901);
     ht->table[ht->func(ht->table_size, random)] = random;
     ht->used[ht->func(ht->table_size, random)] = 1;
     if(!hashtable_search(ht, random))
-        return 0;
-    if(hashtable_search(ht, random_at_most(rand())))
         return 0;
     return 1;
 }
@@ -307,7 +310,16 @@ static u8 test_hashtable_insert_closed(HT *ht){
         ret &= 0;
     if(hashtable_insert(ht, random))
         ret &= 0;
-    
+    memset(ht->used, 0, sizeof(u8) * ht->table_size);
+    i64 *arr = arr_new(ht->table_size);
+    arr_fill_rand(arr, HASHTABLE_TEST_ITEM_COUNT, 901942, SAMPLE_CASE_BEST);
+    for(i64 i = 0;i < HASHTABLE_TEST_ITEM_COUNT;i++){
+        if(!hashtable_insert(ht, arr[i])){
+            ret &= 0;
+            break;
+        }
+    }
+    free(arr);
     return ret;
 }
 
