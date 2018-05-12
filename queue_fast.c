@@ -143,13 +143,15 @@ static i64 test_queue_count(FastCircularQueue *queue){
 }
 
 void test_queue(){
-    TEST("Queue Creation", test_queue_new(QUEUE_TEST_ITEM_COUNT));
-    TEST("Queue Insertion", test_queue_insert(testQueue, 4823));
-    TEST("Queue Insertion At Front", test_queue_insert_at_front(testQueue, 239943));
-    TEST("Queue Deletion", test_queue_delete(testQueue));
-    TEST("Queue Deletion From Rear", test_queue_delete_from_rear(testQueue));
-    TEST("Queue Counting", test_queue_count(testQueue));
+    tst_suite_start("Queue", 6);
+    TEST("Creation", test_queue_new(QUEUE_TEST_ITEM_COUNT));
+    TEST("Insertion", test_queue_insert(testQueue, 4823));
+    TEST("Insertion At Front", test_queue_insert_at_front(testQueue, 239943));
+    TEST("Deletion", test_queue_delete(testQueue));
+    TEST("Deletion From Rear", test_queue_delete_from_rear(testQueue));
+    TEST("Counting", test_queue_count(testQueue));
     queue_free(testQueue);
+    tst_suite_end();
 }
 
 #endif

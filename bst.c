@@ -399,21 +399,23 @@ bst_count_test(leaves, WORST, 1)
 #undef bst_count_test
 
 void test_bst(){
-    TEST("Binary Search Tree Creation", test_bst_create(BST_TEST_ITEM_COUNT));
+    tst_suite_start("Binary Search Tree", 13);
+    TEST("Creation", test_bst_create(BST_TEST_ITEM_COUNT));
     BST *bst = bst_test_gen;
-    TEST("Binary Search Tree Searching", bst_search(bst, bst->value));
-    TEST("Binary Search Tree Insertion", test_bst_insert(bst, random_at_most(BST_TEST_ITEM_COUNT)));
-    TEST("Binary Search Tree Deletion", test_bst_delete(&bst));
+    TEST("Searching", bst_search(bst, bst->value));
+    TEST("Insertion", test_bst_insert(bst, random_at_most(BST_TEST_ITEM_COUNT)));
+    TEST("Deletion", test_bst_delete(&bst));
     bst_free(bst);
     bst_test_array = arr_new(BST_TEST_ITEM_COUNT);
-    TEST("Binary Search Tree Total Node Count", test_bst_count_nodes());
-    TEST("Binary Search Tree Internal Node Count", test_bst_count_internal());
-    TEST("Binary Search Tree Leaf Node Count", test_bst_count_leaves());
-    TEST("Binary Search Tree Preorder", test_bst_preorder());
-    TEST("Binary Search Tree Preorder Non Recursive", test_bst_preorder_nonrec());
-    TEST("Binary Search Tree Inorder", test_bst_inorder());
-    TEST("Binary Search Tree Inorder Non Recursive", test_bst_inorder_nonrec());
-    TEST("Binary Search Tree Postorder", test_bst_postorder());
-    TEST("Binary Search Tree Postorder Non Recursive", test_bst_postorder_nonrec());
+    TEST("Total Node Count", test_bst_count_nodes());
+    TEST("Internal Node Count", test_bst_count_internal());
+    TEST("Leaf Node Count", test_bst_count_leaves());
+    TEST("Preorder", test_bst_preorder());
+    TEST("Preorder Non Recursive", test_bst_preorder_nonrec());
+    TEST("Inorder", test_bst_inorder());
+    TEST("Inorder Non Recursive", test_bst_inorder_nonrec());
+    TEST("Postorder", test_bst_postorder());
+    TEST("Postorder Non Recursive", test_bst_postorder_nonrec());
+    tst_suite_end();
     free(bst_test_array);
 }

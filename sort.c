@@ -606,6 +606,48 @@ sort_test(radix_sort, SORT_TEST_ITEM_COUNT, 58683);
 #endif
 
 void test_sort(){
+    u64 test_count = 0;
+#ifdef SORT_ENABLE_TEST_BUBBLE
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_BUBBLE_REC
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_BUBBLE_ADV
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_INSERTION
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_INSERTION_REC
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_SELECTION
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_SELECTION_REC
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_QUICK
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_QUICK_NONREC
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_MERGE
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_MERGE_NONREC
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_HEAP
+    test_count++;
+#endif
+#ifdef SORT_ENABLE_TEST_RADIX
+    test_count++;
+#endif
+    if(test_count > 0)
+        tst_suite_start("Sorting", test_count);
 #ifdef SORT_ENABLE_TEST_BUBBLE
     TEST("Bubble Sort", test_bubble_sort());
 #endif
@@ -645,4 +687,6 @@ void test_sort(){
 #ifdef SORT_ENABLE_TEST_RADIX
     TEST("Radix Sort", test_radix_sort());
 #endif
+    if(test_count > 0)
+        tst_suite_end();
 }

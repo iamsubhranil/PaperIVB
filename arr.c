@@ -139,9 +139,11 @@ static i64 test_arr_copy(i64 *source, siz n){
 
 void test_arr(){
     i64 *arr = arr_new(10);
-    TEST("Array Create", arr);
-    TEST("Array Fill", test_arr_fill(arr));
-    TEST("Array Copy", test_arr_copy(arr, 10));
+    tst_suite_start("Array", 3);
+    TEST("Create", arr);
+    TEST("Fill", test_arr_fill(arr));
+    TEST("Copy", test_arr_copy(arr, 10));
     arr_free(arr);
+    tst_suite_end();
     TEST("Random In Range", test_random_at_most());
 }

@@ -207,18 +207,20 @@ stk_api(new_bool, push_bool, push_fast_bool,
 
 void test_stack(){
 #define stk_tst(name, name_new, name_push, name_pushf, name_pop, name_popf, name_size, name_free) \
-    TEST(#name " Stack Creation", test_stack_##name_new(10)); \
+    tst_suite_start( "Stack (Type : " #name ")", 8); \
+    TEST("Creation", test_stack_##name_new(10)); \
     Stack stack_##name = stack_##name_new(10, 1); \
     Stack stack2_##name = stack_##name_new(10, 0); \
-    TEST(#name " Stack Push", test_stack_##name_push(stack_##name)); \
-    TEST(#name " Stack Overflow", test_stack_overflow_##name_push(stack2_##name)); \
-    TEST(#name " Stack Grow", test_stack_grow_##name_push(stack_##name)); \
-    TEST(#name " Stack Pop", test_stack_##name_pop(stack_##name)); \
-    TEST(#name " Stack Underflow", test_stack_underflow_##name_pop(stack2_##name)); \
-    TEST(#name " Stack Size", test_stack_##name_size(stack_##name)); \
-    TEST(#name " Stack Empty", test_stack_empty_##name_pop(stack_##name)); \
+    TEST("Push", test_stack_##name_push(stack_##name)); \
+    TEST("Overflow", test_stack_overflow_##name_push(stack2_##name)); \
+    TEST("Grow", test_stack_grow_##name_push(stack_##name)); \
+    TEST("Pop", test_stack_##name_pop(stack_##name)); \
+    TEST("Underflow", test_stack_underflow_##name_pop(stack2_##name)); \
+    TEST("Size", test_stack_##name_size(stack_##name)); \
+    TEST("Empty", test_stack_empty_##name_pop(stack_##name)); \
     stack_##name_free(stack_##name); \
-    stack_##name_free(stack2_##name);
+    stack_##name_free(stack2_##name); \
+    tst_suite_end();
 
     stk_tst(Integer, new, push, push_fast, pop, pop_fast, size, free);
     stk_tst(Generic, new_generic, push_generic, push_fast_generic, pop_generic, pop_fast_generic,
