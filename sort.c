@@ -78,10 +78,10 @@ i64 check_sort(i64 *arr, siz n, SortType type){
 #define sort_test(name, sz, customrange) sort_test2(name, sz, customrange)
 #endif
 
-static void swap(i64 *p1, i64 *p2){
-    i64 p3 = *p1;
-    *p1 = *p2;
-    *p2 = p3;
+#define swap(p1, p2){ \
+    i64 p3 = p1; \
+    p1 = p2; \
+    p2 = p3; \
 }
 
 void bubble_sort(i64 *arr, siz n){
@@ -94,7 +94,7 @@ void bubble_sort(i64 *arr, siz n){
             histo_draw(arr, n, 2, pass, ANSI_COLOR_BLUE, i, ANSI_COLOR_GREEN);
 #endif
             if(arr[i] > arr[i+1]){
-                swap(&arr[i], &arr[i+1]);
+                swap(arr[i], arr[i+1]);
             }
         }
     }
@@ -115,7 +115,7 @@ static void bubble_sort_rec2(i64 *arr, siz pass, siz n){
             histo_draw(arr, n, 2, pass, ANSI_COLOR_BLUE, i, ANSI_COLOR_GREEN);
 #endif
         if(arr[i] > arr[i+1]){
-            swap(&arr[i], &arr[i+1]);
+            swap(arr[i], arr[i+1]);
         }
     }
     bubble_sort_rec2(arr, pass+1, n);
@@ -143,7 +143,7 @@ void bubble_sort_adv(i64 *arr, siz n){
             histo_draw(arr, n, 2, pass, ANSI_COLOR_BLUE, i, ANSI_COLOR_GREEN);
 #endif
             if(arr[i] > arr[i+1]){
-                swap(&arr[i], &arr[i+1]);
+                swap(arr[i], arr[i+1]);
                 flag = 1;
             }
         }
@@ -220,7 +220,7 @@ void selection_sort(i64 *arr, siz n){
             }
         }
         if(minidx != i)
-            swap(&arr[i], &arr[minidx]);
+            swap(arr[i], arr[minidx]);
     }
 #ifdef SORT_ENABLE_VISUAL
             histo_draw(arr, n, 0);
@@ -240,7 +240,7 @@ static void selection_sort_rec2(i64 *arr, siz i, siz n){
             minidx = j;
     }
     if(minidx != i)
-        swap(&arr[i], &arr[minidx]);
+        swap(arr[i], arr[minidx]);
     selection_sort_rec2(arr, i + 1, n);
 }
 
@@ -273,14 +273,14 @@ static siz quick_sort_partition(i64 *arr, siz m, siz n, siz total){
 #endif
         } while(arr[j] > pivot && j > m);
         if(i < j){
-            swap(&arr[i], &arr[j]);
+            swap(arr[i], arr[j]);
 #ifdef SORT_ENABLE_VISUAL
             histo_draw(arr, total, 3, i, ANSI_COLOR_BLUE, j, ANSI_COLOR_GREEN, m, ANSI_COLOR_RED);
 #endif
         }
     } while(i < j);
     if(j != m)
-        swap(&arr[m], &arr[j]);
+        swap(arr[m], arr[j]);
 #ifdef SORT_ENABLE_VISUAL
     histo_draw(arr, total, 3, i, ANSI_COLOR_BLUE, j, ANSI_COLOR_GREEN, m, ANSI_COLOR_RED);
 #endif
@@ -481,7 +481,7 @@ static i64* heap_create(i64 *arr, siz n){
 #endif
             // Min heap
             if(heap[j] < heap[parent]){
-                swap(&heap[j], &heap[parent]);
+                swap(heap[j], heap[parent]);
                 j = parent;
                 continue;
             }
@@ -512,7 +512,7 @@ static void heap_rebuild(i64 *arr, siz n){
             min = rightChild;
         }
         if(min != j){
-            swap(&arr[min], &arr[j]);
+            swap(arr[min], arr[j]);
             j = min;
             continue;
         }
