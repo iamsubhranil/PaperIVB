@@ -38,6 +38,7 @@ void bst_preorder_nonrec(BinarySearchTree bst, bst_process process);
 i64 bst_count_leaves(BinarySearchTree bst);
 i64 bst_count_internal(BinarySearchTree bst);
 i64 bst_count_nodes(BinarySearchTree bst);
+i64 bst_find_height(BinarySearchTree bst);
 
 void bst_print(BinarySearchTree bst);
 

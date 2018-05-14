@@ -18,14 +18,14 @@ static BST* bst_new_node(){
 
 u8 bst_insert(BST *bst, i64 value){
     BST *tmp = bst, *prev = bst;
-    while(tmp != NULL){
-        if(value == tmp->value)
-            return 0;
+    while(tmp){
         prev = tmp;
         if(value > tmp->value)
             tmp = tmp->right;
-        else
+        else if(value < tmp->value)
             tmp = tmp->left;
+        else
+            return 0;
     }
     if(value > prev->value){
         prev->right = bst_new_node();
@@ -250,7 +250,7 @@ void bst_postorder_nonrec(BST *bst, bst_process process){
         else{
             stack_push_bool(b, 1);
             stack_push_generic(s, cur);
-            cur = cur->right;
+            ptr = cur->right;
         }
     } while(!stack_is_empty(s) || ptr != NULL);
     stack_free_generic(s);
@@ -363,53 +363,55 @@ static void test_bst_order_process(i64 value){
     bst_test_pointer++;
 }
 
-#define bst_order_test(ordername, input_order, output_order) \
+static BST *bst_order_test_tree = NULL;
+
+#define bst_order_test(ordername, output_order) \
 static i64 test_bst_##ordername(){ \
     bst_test_pointer = 0; \
-    arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 20003, SAMPLE_CASE_AVERAGE); \
-    i64 *bst_input_array = arr_new(BST_TEST_ITEM_COUNT); \
-    arr_fill_rand(bst_input_array, BST_TEST_ITEM_COUNT, 898213, SAMPLE_CASE_##input_order); \
-    BST  *bst = bst_create(bst_input_array, BST_TEST_ITEM_COUNT); \
-    bst_##ordername(bst, test_bst_order_process); \
-    i64 ret = check_sort(bst_test_array, bst_count_nodes(bst), SORT_TYPE_##output_order); \
-    free(bst_input_array); \
-    bst_free(bst); \
+    arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 3289983, SAMPLE_CASE_AVERAGE); \
+    bst_##ordername(bst_order_test_tree, test_bst_order_process); \
+    i64 ret = check_sort(bst_test_array, bst_count_nodes(bst_order_test_tree), SORT_TYPE_##output_order); \
     return ret;  \
 }
 
-bst_order_test(inorder, AVERAGE, ASCENDING)
-bst_order_test(inorder_nonrec, AVERAGE, ASCENDING)
-bst_order_test(preorder, WORST, DESCENDING)
-bst_order_test(preorder_nonrec, WORST, DESCENDING)
-bst_order_test(postorder, WORST, ASCENDING)
-bst_order_test(postorder_nonrec, WORST, ASCENDING)
+bst_order_test(inorder, ASCENDING)
+bst_order_test(inorder_nonrec, ASCENDING)
+bst_order_test(preorder, ASCENDING)
+bst_order_test(preorder_nonrec, ASCENDING)
+bst_order_test(postorder, DESCENDING)
+bst_order_test(postorder_nonrec, DESCENDING)
 
 
 #undef bst_order_test
 
-#define bst_count_test(name, order, value)\
+#define bst_count_test(name, value)\
 static i64 test_bst_count_##name(){ \
-    arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 5482902, SAMPLE_CASE_##order); \
-    BST *bst = bst_create(bst_test_array, BST_TEST_ITEM_COUNT); \
-    i64 ret = bst_count_##name(bst) == value; \
-    bst_free(bst); \
+    if(bst_order_test_tree == NULL) { \
+        bst_test_pointer = 0; \
+        bst_test_array = arr_new(BST_TEST_ITEM_COUNT); \
+        tst_pause("Creating binary tree"); \
+        arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 20003, SAMPLE_CASE_AVERAGE); \
+        i64 *bst_input_array = arr_new(BST_TEST_ITEM_COUNT); \
+        arr_fill_rand(bst_input_array, BST_TEST_ITEM_COUNT, 898213, SAMPLE_CASE_BEST); \
+        bst_order_test_tree = bst_create(bst_input_array, BST_TEST_ITEM_COUNT); \
+        free(bst_input_array); \
+        tst_resume("Couting"); \
+    } \
+    i64 ret = bst_count_##name(bst_order_test_tree) == value; \
     return ret; \
 }
 
-bst_count_test(nodes, BEST, BST_TEST_ITEM_COUNT)
-bst_count_test(internal, BEST, BST_TEST_ITEM_COUNT - 1)
-bst_count_test(leaves, WORST, 1)
+bst_count_test(nodes, BST_TEST_ITEM_COUNT)
+bst_count_test(internal, BST_TEST_ITEM_COUNT - 1)
+bst_count_test(leaves, 1)
 
 #undef bst_count_test
 
 static i64 test_bst_find_height(){
-    arr_fill_rand(bst_test_array, BST_TEST_ITEM_COUNT, 889201, SAMPLE_CASE_BEST);
-    BST *bst = bst_create(bst_test_array, BST_TEST_ITEM_COUNT);
-    i64 ret = 1;
-    if(bst_find_height(bst) != BST_TEST_ITEM_COUNT - 1)
-        ret = 0;
-    bst_free(bst);
-    return ret;
+    tst_resume("Finding height");
+    if(bst_find_height(bst_order_test_tree) != BST_TEST_ITEM_COUNT - 1)
+        return 0;
+    return 1;
 }
 
 void test_bst(){
@@ -420,7 +422,6 @@ void test_bst(){
     TEST("Insertion", test_bst_insert(bst, random_at_most(BST_TEST_ITEM_COUNT)));
     TEST("Deletion", test_bst_delete(&bst));
     bst_free(bst);
-    bst_test_array = arr_new(BST_TEST_ITEM_COUNT);
     TEST("Total Node Count", test_bst_count_nodes());
     TEST("Internal Node Count", test_bst_count_internal());
     TEST("Leaf Node Count", test_bst_count_leaves());
@@ -431,6 +432,7 @@ void test_bst(){
     TEST("Inorder Non Recursive", test_bst_inorder_nonrec());
     TEST("Postorder", test_bst_postorder());
     TEST("Postorder Non Recursive", test_bst_postorder_nonrec());
-    tst_suite_end();
     free(bst_test_array);
+    bst_free(bst_order_test_tree);
+    tst_suite_end();
 }
