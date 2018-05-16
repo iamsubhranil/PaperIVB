@@ -45,7 +45,7 @@ static u64 suite_tests_passed = 0, suite_tests_failed = 0;
 
 static void print_suite_test_count(){
     if(suite_test_count >= suite_tests_done){
-        pcyn("\r%3" Pu64 "/%-3" Pu64 " ", suite_tests_done, suite_test_count);
+        pblue("\r%3" Pu64 "/%-3" Pu64 " ", suite_tests_done, suite_test_count);
     }
     else
         pylw(ANSI_FONT_BOLD "\r%6" Pu64 "  ", global_suite_tests_done);
