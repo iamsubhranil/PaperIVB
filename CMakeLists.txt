@@ -29,7 +29,10 @@ target_link_libraries(sort  test
 add_library(bst SHARED bst.c)
 target_link_libraries(bst   test
                             array
-                            utils)
+                            utils
+                            sort
+                            stack
+                            display)
 
 add_library(avl SHARED avl.c)
 target_link_libraries(avl   test
@@ -41,7 +44,9 @@ target_link_libraries(ht    test
                             utils)
 
 add_executable(paperivb main.c)
-target_link_libraries(paperivb sort
+target_link_libraries(paperivb  array
+                                stack
+                                sort
                                 bst
                                 queue
                                 ht
