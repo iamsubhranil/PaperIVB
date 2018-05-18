@@ -6,6 +6,7 @@
 #include "bst.h"
 #include "queue.h"
 #include "hashtable.h"
+#include "avl.h"
 
 int main(){
     test_arr();
@@ -14,5 +15,6 @@ int main(){
     test_sort();
     test_bst();
     test_hashtable();
+    test_avl();
     printf("\n");
 }
