@@ -10,6 +10,9 @@ target_link_libraries(array test
                             display
                             utils)
 
+add_library(dump SHARED dump.c)
+target_link_libraries(dump  display)
+
 add_library(stack SHARED stack.c)
 target_link_libraries(stack test
                             utils)
@@ -50,6 +53,7 @@ target_link_libraries(paperivb  array
                                 bst
                                 queue
                                 ht
-                                avl)
+                                avl
+                                dump)
 
 add_definitions(-DSORT_ENABLE_TEST_ALL -DSORT_TEST_ITEM_COUNT=100000 -DBST_TEST_ITEM_COUNT=100000)

@@ -4,6 +4,7 @@
 #include "display.h"
 #include "stack.h"
 #include "queue.h"
+#include "dump.h"
 
 #ifdef SORT_ENABLE_VISUAL
 
@@ -39,6 +40,7 @@ i64 check_sort(i64 *arr, siz n, SortType type){
         i64 *arr = arr_new(size); \
         tst_pause("Generating random input : Best Case"); \
         arr_fill_rand(arr, size, size, SAMPLE_CASE_BEST); \
+        dump_set(arr, size); \
         tst_resume("Best Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
@@ -47,6 +49,7 @@ i64 check_sort(i64 *arr, siz n, SortType type){
         } \
         tst_pause("Generating random input : Worst Case"); \
         arr_fill_rand(arr, size, -size, SAMPLE_CASE_WORST); \
+        dump_set(arr, size); \
         tst_resume("Worst Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
@@ -55,6 +58,7 @@ i64 check_sort(i64 *arr, siz n, SortType type){
         } \
         tst_pause("Generating random input : Average Case"); \
         arr_fill_rand(arr, size, customrange, SAMPLE_CASE_AVERAGE); \
+        dump_set(arr, size); \
         tst_resume("Average Case"); \
         name(arr, size); \
         tst_pause("Checking result"); \
@@ -63,6 +67,7 @@ i64 check_sort(i64 *arr, siz n, SortType type){
         } \
         goto _test_done_##name; \
         _test_fail_##name: \
+        dump_data(#name "_fail"); \
         tst_resume("Cleanup"); \
         free(arr); \
         return 0; \

@@ -7,8 +7,10 @@
 #include "queue.h"
 #include "hashtable.h"
 #include "avl.h"
+#include "dump.h"
 
 int main(){
+    dump_init();
     test_arr();
     test_stack();
     test_queue();
