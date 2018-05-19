@@ -546,10 +546,17 @@ void radix_sort(i64 *arr, siz n){
 #ifdef SORT_ENABLE_VISUAL
     histo_set_title("Radix Sort");
 #endif
-    i64 max = arr[0];
-    for(siz i = 1;i < n;i++)
+    i64 max = arr[0], min = arr[0];
+    for(siz i = 1;i < n;i++){
         if(arr[i] > max)
             max =  arr[i];
+        if(arr[i] < min)
+            min = arr[i];
+    }
+
+    min = min < 0 ? -min : min;
+    if(min > max)
+        max = min;
 
     i64 passes = 1;
     if(max < 0)
