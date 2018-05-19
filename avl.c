@@ -165,6 +165,14 @@ Avl* avl_create(i64 *arr, siz n){
     return root;
 }
 
+void avl_free(Avl *avl){
+    if(avl == NULL)
+        return;
+    avl_free(avl->left);
+    avl_free(avl->right);
+    free(avl);
+}
+
 static Avl *test_avl_tree = NULL;
 
 static u8 test_avl_create(){
@@ -181,5 +189,6 @@ static u8 test_avl_create(){
 void test_avl(){
     tst_suite_start("AVL Tree", 1);
     TEST("Creation", test_avl_create());
+    avl_free(test_avl_tree);
     tst_suite_end();
 }
