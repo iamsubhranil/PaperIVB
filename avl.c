@@ -143,27 +143,19 @@ u8 avl_insert(Avl **root, i64 val){
 
     if(balance > 1 && val < avl->left->value){
         avl = avl_rotate_right(avl);
-        goto avl_insert_end;
     }
-
-    if(balance < -1 && val > avl->right->value){
+    else if(balance < -1 && val > avl->right->value){
         avl = avl_rotate_left(avl);
-        goto avl_insert_end;
     }
-
-    if(balance > 1 && val > avl->left->value){
+    else if(balance > 1 && val > avl->left->value){
         avl->left = avl_rotate_left(avl->left);
         avl = avl_rotate_right(avl);
-        goto avl_insert_end;
     }
-
-    if(balance < -1 && val < avl->right->value){
+    else if(balance < -1 && val < avl->right->value){
         avl->right = avl_rotate_right(avl->right);
         avl = avl_rotate_left(avl);
-        goto avl_insert_end;
     }
 
-avl_insert_end:
     *root = avl;
 
     return 1;
