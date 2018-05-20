@@ -5,6 +5,7 @@
 #include "avl.h"
 #include "arr.h"
 #include "test.h"
+#include "utils.h"
 
 typedef struct Avl{
     i64 value;
@@ -65,6 +66,17 @@ i64 avl_height(Avl *root){
     if(root == NULL)
         return 0;
     return root->height;
+}
+
+u8 avl_search(Avl *root, i64 val){
+    if(root == NULL)
+        return 0;
+    if(root->value == val)
+        return 1;
+    if(val > root->value)
+        return avl_search(root->right, val);
+    else
+        return avl_search(root->left, val);
 }
 
 static i64 avl_find_height(Avl *root){
@@ -157,6 +169,60 @@ avl_insert_end:
     return 1;
 }
 
+u8 avl_delete(Avl **root, i64 val){
+    Avl *avl = *root;
+
+    if(avl == NULL)
+        return 0;
+
+    if(val < avl->value)
+       avl_delete(&avl->left, val);
+    else if(val > avl->value)
+       avl_delete(&avl->right, val);
+    else{
+        if(avl->left == NULL || avl->right == NULL){
+            Avl *tmp = avl->left ? avl->left : avl->right;
+            *root = tmp;
+
+            free(avl);
+            avl = tmp;
+        }
+        else{
+            Avl *tmp = avl->right;
+            while(tmp->left != NULL)
+                tmp = tmp->left;
+            avl->value = tmp->value;
+            avl_delete(&avl->right, tmp->value);
+        }
+    }
+
+    if(*root == NULL)
+        return 1;
+    
+    avl->height = avl_find_height(avl);
+
+    i64 balance = avl_get_balance(avl);
+
+    if(balance > 1 && avl_get_balance(avl->left) >= 0)
+        avl = avl_rotate_right(avl);
+    else if(balance > 1 && avl_get_balance(avl->left) < 0){
+        avl->left = avl_rotate_left(avl->left);
+        avl = avl_rotate_right(avl);
+    }
+    else if(balance < -1 && avl_get_balance(avl->right) <= 0){
+        avl = avl_rotate_left(avl);
+    }
+    else if(balance < -1 && avl_get_balance(avl->right) > 0){
+        avl->right = avl_rotate_right(avl->right);
+        avl = avl_rotate_left(avl);
+    }
+
+    *root = avl;
+
+    return 1;
+
+}
+
 Avl* avl_create(i64 *arr, siz n){
     Avl *root = NULL;
     for(siz s = 0;s < n;s++){
@@ -186,9 +252,57 @@ static u8 test_avl_create(){
     return test_avl_tree ? 1 : 0;
 }
 
+static i64 test_avl_insert(Avl **avl, i64 value){
+    avl_insert(avl, value);
+    if(!avl_search(*avl, value))
+        return 0;
+    i64 nval = random_at_most(value);
+    while(nval > 0){
+        i64 nval2 = random_at_most(value);
+        avl_insert(avl, nval2);
+        if(!avl_search(*avl, nval2))
+            return 0;
+        nval--;
+    }
+    return 1;
+}
+
+static i64 test_avl_delete(Avl **avl1){
+   // avl *avl = *avl1;
+    i64 rootval = (*avl1)->value;
+    avl_delete(avl1, rootval);
+    if((*avl1)->value == rootval)
+        return 0;
+    Avl *ptr = *avl1;
+    while(ptr->left && ptr->right)
+        ptr = ptr->left;
+    rootval = ptr->value;
+    if(!avl_delete(avl1, rootval))
+        return 0;
+    ptr = *avl1;
+    while(ptr->left || ptr->right){
+        if(ptr->right)
+            ptr = ptr->right;
+        else
+            ptr = ptr->left;
+    }
+    rootval = ptr->value;
+    if(!avl_delete(avl1, rootval))
+        return 0;
+    while((*avl1)->left || (*avl1)->right)
+        if(!avl_delete(avl1, (*avl1)->value))
+            return 0;
+    if((*avl1)->left || (*avl1)->right)
+        return 0;
+    return 1;
+}
+
 void test_avl(){
-    tst_suite_start("AVL Tree", 1);
+    tst_suite_start("AVL Tree", 4);
     TEST("Creation", test_avl_create());
+    TEST("Searching", avl_search(test_avl_tree, test_avl_tree->value));
+    TEST("Insertion", test_avl_insert(&test_avl_tree, random_at_most(AVL_TEST_ITEM_COUNT)));
+    TEST("Deletion", test_avl_delete(&test_avl_tree));
     avl_free(test_avl_tree);
     tst_suite_end();
 }
