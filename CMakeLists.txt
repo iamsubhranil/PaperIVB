@@ -40,7 +40,8 @@ target_link_libraries(bst   test
 add_library(avl SHARED avl.c)
 target_link_libraries(avl   test
                             array
-                            display)
+                            display
+                            utils)
 
 add_library(ht SHARED hashtable.c)
 target_link_libraries(ht    test
@@ -56,4 +57,4 @@ target_link_libraries(paperivb  array
                                 avl
                                 dump)
 
-add_definitions(-DSORT_ENABLE_TEST_ALL -DSORT_TEST_ITEM_COUNT=100000 -DBST_TEST_ITEM_COUNT=100000)
+add_definitions(-DSORT_ENABLE_TEST_ALL -DSORT_TEST_ITEM_COUNT=50000 -DBST_TEST_ITEM_COUNT=50000 -DAVL_TEST_ITEM_COUNT=50000)
