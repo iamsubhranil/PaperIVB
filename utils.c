@@ -31,3 +31,11 @@ LinkedNode* linkednode_get(i64 value){
     node->val = value;
     return node;
 }
+
+void linkednode_free(LinkedNode *node){
+    if(node == NULL)
+        return;
+    LinkedNode *bak = node->next;
+    free(node);
+    linkednode_free(bak);
+}
