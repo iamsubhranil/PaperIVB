@@ -8,6 +8,57 @@
 #include "stack.h"
 #include "test.h"
 
+void graph_print_path(siz prev[], siz vsource, siz vdest){
+    if(vdest != vsource){
+        graph_print_path(prev, vsource, prev[vdest]);
+    }
+    printf(ANSI_FONT_BOLD "%" Psiz ANSI_COLOR_RESET " --> ", vdest + 1);
+}
+
+void graph_print_vertex(siz u){
+    printf("%" Psiz, u);
+}
+
+void graph_print_edge(siz u, siz v){
+    printf("(%" Psiz ", %" Psiz")", u, v);
+}
+
+u8 **graph_create_matrix_adjacency(siz n, ...){
+    u8 **adjacency = (u8 **)malloc(sizeof(u8 *) * n);
+    for(siz i = 0;i < n;i++)
+        adjacency[i] = (u8 *)malloc(sizeof(u8) * n);
+
+    va_list vals;
+    va_start(vals, n);
+    
+    for(siz i = 0;i < n;i++){
+        for(siz j = 0;j < n;j++){
+            adjacency[i][j] = va_arg(vals, int) ? 1 : 0;
+        }
+    }
+    va_end(vals);
+    return adjacency;
+}
+
+i64 **graph_create_matrix_length(siz n, ...){
+    i64 **length = (i64 **)malloc(sizeof(i64 *) * n);
+    for(siz i = 0;i < n;i++)
+        length[i] = (i64 *)malloc(sizeof(i64) * n);
+
+    va_list vals;
+    va_start(vals, n);
+    
+    for(siz i = 0;i < n;i++){
+        for(siz j = 0;j < n;j++){
+            length[i][j] = va_arg(vals, int);
+        }
+    }
+
+    va_end(vals);
+
+    return length;
+}
+
 void graph_bfs(u8 **adjacency_matrix, siz vertices, siz vstart, graph_process_vertex process){
     u8 status[vertices];
 
@@ -118,57 +169,6 @@ i64 graph_dijkstras_shortest_path(i64 **length_matrix, siz vertices, siz vsource
     process(prev, vsource, vdest);
     
     return dist[vdest];
-}
-
-void graph_print_path(siz prev[], siz vsource, siz vdest){
-    if(vdest != vsource){
-        graph_print_path(prev, vsource, prev[vdest]);
-    }
-    printf(ANSI_FONT_BOLD "%" Psiz ANSI_COLOR_RESET " --> ", vdest + 1);
-}
-
-void graph_print_vertex(siz u){
-    printf("%" Psiz, u);
-}
-
-void graph_print_edge(siz u, siz v){
-    printf("(%" Psiz ", %" Psiz")", u, v);
-}
-
-u8 **graph_create_matrix_adjacency(siz n, ...){
-    u8 **adjacency = (u8 **)malloc(sizeof(u8 *) * n);
-    for(siz i = 0;i < n;i++)
-        adjacency[i] = (u8 *)malloc(sizeof(u8) * n);
-
-    va_list vals;
-    va_start(vals, n);
-    
-    for(siz i = 0;i < n;i++){
-        for(siz j = 0;j < n;j++){
-            adjacency[i][j] = va_arg(vals, int) ? 1 : 0;
-        }
-    }
-    va_end(vals);
-    return adjacency;
-}
-
-i64 **graph_create_matrix_length(siz n, ...){
-    i64 **length = (i64 **)malloc(sizeof(i64 *) * n);
-    for(siz i = 0;i < n;i++)
-        length[i] = (i64 *)malloc(sizeof(i64) * n);
-
-    va_list vals;
-    va_start(vals, n);
-    
-    for(siz i = 0;i < n;i++){
-        for(siz j = 0;j < n;j++){
-            length[i][j] = va_arg(vals, int);
-        }
-    }
-
-    va_end(vals);
-
-    return length;
 }
 
 static siz graph_visited_vertices[8] = {0};
