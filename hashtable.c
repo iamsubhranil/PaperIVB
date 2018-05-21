@@ -142,13 +142,6 @@ static u8 hashtable_search_open(HT *ht, i64 value){
     return 0;
 }
 
-static LinkedNode* linkednode_get(i64 val){
-    LinkedNode *p = (LinkedNode *)malloc(sizeof(LinkedNode));
-    p->val = val;
-    p->next = NULL;
-    return p;
-}
-
 static u8 hashtable_insert_open(HT *ht, i64 value){
     if(hashtable_search_open(ht, value))
         return 0;

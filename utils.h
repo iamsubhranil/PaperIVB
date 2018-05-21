@@ -12,3 +12,4 @@ typedef struct LinkedNode{
 } LinkedNode;
 
 i64 random_at_most(i64 range);
+LinkedNode* linkednode_get(i64 value);

@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "utils.h"
 
 
@@ -20,4 +21,13 @@ i64 random_at_most(i64 max) {
 
   // Truncated division is intentional
   return x/bin_size;
+}
+
+LinkedNode* linkednode_get(i64 value){
+    LinkedNode *node = (LinkedNode *)malloc(sizeof(LinkedNode));
+    if(!node)
+        return NULL;
+    node->next = NULL;
+    node->val = value;
+    return node;
 }
