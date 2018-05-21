@@ -15,6 +15,24 @@ void graph_print_path(siz prev[], siz vsource, siz vdest){
     printf(ANSI_FONT_BOLD "%" Psiz ANSI_COLOR_RESET " --> ", vdest + 1);
 }
 
+void graph_print_linked_path(LinkedNode *path){
+    if(path == NULL)
+        return;
+    printf("\nPath : %" Pi64, path->val + 1);
+    path = path->next;
+    while(path != NULL){
+        printf(" --> %" Pi64, path->val + 1);
+        path = path->next;
+    }
+}
+
+void graph_print_linked_path_with_length(LinkedNode *path, i64 length){
+    if(path == NULL)
+        return;
+    graph_print_linked_path(path);
+    printf("\t Length : %" Pi64, length);
+}
+
 void graph_print_vertex(siz u){
     printf("%" Psiz, u);
 }
@@ -30,7 +48,7 @@ u8 **graph_create_matrix_adjacency(siz n, ...){
 
     va_list vals;
     va_start(vals, n);
-    
+
     for(siz i = 0;i < n;i++){
         for(siz j = 0;j < n;j++){
             adjacency[i][j] = va_arg(vals, int) ? 1 : 0;
@@ -47,7 +65,7 @@ i64 **graph_create_matrix_length(siz n, ...){
 
     va_list vals;
     va_start(vals, n);
-    
+
     for(siz i = 0;i < n;i++){
         for(siz j = 0;j < n;j++){
             length[i][j] = va_arg(vals, int);
@@ -90,7 +108,7 @@ void graph_bfs(u8 **adjacency_matrix, siz vertices, siz vstart, graph_process_ve
 
 void graph_dfs(u8 **adjacency_matrix, siz vertices, siz vstart, graph_process_vertex process){
     u8 status[vertices], all_visited = 0;
-    
+
     vstart--;
 
     for(siz i = 0;i < vertices;i++)
@@ -126,12 +144,13 @@ void graph_dfs(u8 **adjacency_matrix, siz vertices, siz vstart, graph_process_ve
             }
         }
     } while(!all_visited);
+    stack_free(s);
 }
 
 i64 graph_dijkstras_shortest_path(i64 **length_matrix, siz vertices, siz vsource, siz vdest, graph_process_path process){
     vsource--;
     vdest--;
-    
+
     u8 status[vertices];
     i64 dist[vertices];
     siz prev[vertices];
@@ -157,7 +176,7 @@ i64 graph_dijkstras_shortest_path(i64 **length_matrix, siz vertices, siz vsource
         }
 
         status[vstar] = 1;
-        
+
         for(siz i = 0;i < vertices;i++){
             if(dist[i] > dist[vstar] + length_matrix[vstar][i]){
                 dist[i] = dist[vstar] + length_matrix[vstar][i];
@@ -167,8 +186,107 @@ i64 graph_dijkstras_shortest_path(i64 **length_matrix, siz vertices, siz vsource
     }
 
     process(prev, vsource, vdest);
-    
+
     return dist[vdest];
+}
+
+static LinkedNode* path_create(siz i, siz j){
+    LinkedNode *n1 = linkednode_get(i);
+    LinkedNode *n2 = linkednode_get(j);
+    n1->next = n2;
+    return n1;
+}
+
+static LinkedNode* path_combine(LinkedNode *p1, LinkedNode *p2){
+    LinkedNode *root = NULL, *prev = NULL;
+    while(p1->next != NULL){
+        LinkedNode *n = linkednode_get(p1->val);
+        if(prev == NULL)
+            root = n;
+        else
+            prev->next = n;
+        prev = n;
+        p1 = p1->next;
+    }
+    while(p2 != NULL){
+        LinkedNode *n = linkednode_get(p2->val);
+        if(prev == NULL)
+            root = n;
+        else
+            prev->next = n;
+        prev = n;
+        p2 = p2->next;
+    }
+    return root;
+}
+
+void graph_floyds_algorithm(i64 **length_matrix, siz vertices, graph_process_linked_path_with_length process){
+    LinkedNode *paths[vertices][vertices];
+    for(siz i = 0;i < vertices;i++){
+        for(siz j = 0;j < vertices;j++){
+            if(length_matrix[i][j] > 0 && length_matrix[i][j] < INT_MAX)
+                paths[i][j] = path_create(i, j);
+            else
+                paths[i][j] = NULL;
+        }
+    }
+
+    for(siz k = 0;k < vertices;k++){
+        for(siz i = 0;i < vertices;i++){
+            for(siz j = 0;j < vertices;j++){
+                if(length_matrix[i][k] + length_matrix[k][j] < length_matrix[i][j]){
+                    length_matrix[i][j] = length_matrix[i][k] + length_matrix[k][j];
+                    LinkedNode *p1 = paths[i][k];
+                    LinkedNode *p2 = paths[k][j];
+                    linkednode_free(paths[i][j]);
+                    paths[i][j] = path_combine(p1, p2);
+                }
+            }
+        }
+    }
+
+    for(siz i = 0;i < vertices;i++){
+        for(siz j = 0;j < vertices;j++){
+            process(paths[i][j], length_matrix[i][j]);
+            linkednode_free(paths[i][j]);
+        }
+    }
+}
+
+void graph_warshalls_algorithm(u8 **adjacency_matrix, siz vertices, graph_process_linked_path process){
+    LinkedNode *paths[vertices][vertices];
+    for(siz i = 0;i < vertices;i++){
+        for(siz j = 0;j < vertices;j++){
+            if(adjacency_matrix[i][j])
+                paths[i][j] = path_create(i, j);
+            else
+                paths[i][j] = NULL;
+        }
+    }
+
+    for(siz k = 0;k < vertices;k++){
+        for(siz i = 0;i < vertices;i++){
+            for(siz j = 0;j < vertices;j++){
+                if(adjacency_matrix[i][j] == 0){
+                    u8 can_reach = adjacency_matrix[i][k] && adjacency_matrix[k][j];
+                    if(can_reach){
+                        adjacency_matrix[i][j] = 1;
+                        LinkedNode *p1 = paths[i][k];
+                        LinkedNode *p2 = paths[k][j];
+                        linkednode_free(paths[i][j]);
+                        paths[i][j] = path_combine(p1, p2);
+                    }
+                }
+            }
+        }
+    }
+
+    for(siz i = 0;i < vertices;i++){
+        for(siz j = 0;j < vertices;j++){
+            process(paths[i][j]);
+            linkednode_free(paths[i][j]);
+        }
+    }
 }
 
 static siz graph_visited_vertices[8] = {0};
@@ -190,14 +308,14 @@ static u8 test_bfs(){
      *
      */
     u8 **adjacency_matrix = graph_create_matrix_adjacency(8,
-                                    0, 1, 0, 1, 0, 0, 0, 0,
-                                    1, 0, 0, 0, 1, 0, 0, 0,
-                                    0, 0, 0, 1, 1, 0, 0, 0,
-                                    1, 0, 1, 0, 0, 1, 1, 0,
-                                    0, 1, 1, 0, 0, 1, 0, 1,
-                                    0, 0, 0, 1, 1, 0, 0, 0,
-                                    0, 0, 0, 1, 0, 0, 0, 1,
-                                    0, 0, 0, 0, 1, 0, 1, 0);
+            0, 1, 0, 1, 0, 0, 0, 0,
+            1, 0, 0, 0, 1, 0, 0, 0,
+            0, 0, 0, 1, 1, 0, 0, 0,
+            1, 0, 1, 0, 0, 1, 1, 0,
+            0, 1, 1, 0, 0, 1, 0, 1,
+            0, 0, 0, 1, 1, 0, 0, 0,
+            0, 0, 0, 1, 0, 0, 0, 1,
+            0, 0, 0, 0, 1, 0, 1, 0);
     graph_bfs(adjacency_matrix, 8, 3, graph_visit_vertex);
     siz expected[] = {3, 4, 5, 1, 6, 7, 2, 8};
     for(siz i = 0;i < 8;i++){
@@ -208,28 +326,28 @@ static u8 test_bfs(){
 }
 
 static u8 test_dfs(){
-   /*
-    *       2 -------- 1
-    *       |          |
-    *       |          |
-    * 5 --- 3 -------- 4 --- 7
-    *   \   |          |   /
-    *    \  |          |  /
-    *     \ |          | /
-    *       6          8
-    *
-    *
-    */
+    /*
+     *       2 -------- 1
+     *       |          |
+     *       |          |
+     * 5 --- 3 -------- 4 --- 7
+     *   \   |          |   /
+     *    \  |          |  /
+     *     \ |          | /
+     *       6          8
+     *
+     *
+     */
 
     u8 **adjacency = graph_create_matrix_adjacency(8,
-                                0, 1, 0, 1, 0, 0, 0, 0,
-                                1, 0, 1, 0, 0, 0, 0, 0,
-                                0, 1, 0, 1, 1, 1, 0, 0,
-                                1, 0, 1, 0, 0, 0, 1, 1,
-                                0, 0, 1, 0, 0, 1, 0, 0,
-                                0, 0, 1, 0, 1, 0, 0, 0,
-                                0, 0, 0, 1, 0, 0, 0, 1,
-                                0, 0, 0, 1, 0, 0, 1, 0);
+            0, 1, 0, 1, 0, 0, 0, 0,
+            1, 0, 1, 0, 0, 0, 0, 0,
+            0, 1, 0, 1, 1, 1, 0, 0,
+            1, 0, 1, 0, 0, 0, 1, 1,
+            0, 0, 1, 0, 0, 1, 0, 0,
+            0, 0, 1, 0, 1, 0, 0, 0,
+            0, 0, 0, 1, 0, 0, 0, 1,
+            0, 0, 0, 1, 0, 0, 1, 0);
 
     graph_visited_vertices_pointer = 0;
     graph_dfs(adjacency, 8, 1, graph_visit_vertex);
@@ -266,13 +384,13 @@ static u8 test_dijkstra(){
      */
 
     i64 **length_matrix = graph_create_matrix_length(7,
-                            0, 3, 6, INT_MAX, INT_MAX, INT_MAX, INT_MAX,
-                            3, 0, 2, 1, INT_MAX, INT_MAX, INT_MAX,
-                            6, 2, 0, 1, 4, 2, INT_MAX,
-                            INT_MAX, 1, 1, 0, 2, INT_MAX, 4,
-                            INT_MAX, INT_MAX, 4, 2, 0, 2, 1,
-                            INT_MAX, INT_MAX, 2, INT_MAX, 2, 0, 1,
-                            INT_MAX, INT_MAX, INT_MAX, 4, 1, 1, 0);
+            0, 3, 6, INT_MAX, INT_MAX, INT_MAX, INT_MAX,
+            3, 0, 2, 1, INT_MAX, INT_MAX, INT_MAX,
+            6, 2, 0, 1, 4, 2, INT_MAX,
+            INT_MAX, 1, 1, 0, 2, INT_MAX, 4,
+            INT_MAX, INT_MAX, 4, 2, 0, 2, 1,
+            INT_MAX, INT_MAX, 2, INT_MAX, 2, 0, 1,
+            INT_MAX, INT_MAX, INT_MAX, 4, 1, 1, 0);
 
     graph_visited_vertices_pointer = 0;
     i64 dist = graph_dijkstras_shortest_path(length_matrix, 7, 1, 7, graph_store_path);
@@ -286,10 +404,63 @@ static u8 test_dijkstra(){
     return 1;
 }
 
+#ifdef GRAPH_ENABLE_TEST_FLOYD_WARSHALL
+static u8 test_floyd(){
+    info("Input graph");        
+    info("        |----------------");
+    info("  |---- 1 ------> 2     |");
+    info("  |    /|\\  2     |     |");
+    info("  |___  |_______  |5    |8");
+    info("   10 |    3    \\ |     |");
+    info("     \\|/         \\|/    |");
+    info("      4 <-------- 3 <----");
+    info("Output : ");
+    i64 **length_matrix = graph_create_matrix_length(4,
+            0, 2, 8, 10,
+            INT_MAX, 0, 5, INT_MAX,
+            3, INT_MAX, 0, 1,
+            INT_MAX, INT_MAX, INT_MAX, 0);
+
+    graph_floyds_algorithm(length_matrix, 4, graph_print_linked_path_with_length);
+    printf("\n");
+    return 1;
+}
+
+static u8 test_warshalls(){
+    info("Input graph");        
+    info("        |----------------");
+    info("  |---- 1 ------> 2     |");
+    info("  |    /|\\        |     |");
+    info("  |___  |_______  |     | ");
+    info("      |         \\ |     |");
+    info("     \\|/         \\|/    |");
+    info("      4 <-------- 3 <----");
+    info("Output : ");
+
+    u8 **adjacency_matrix = graph_create_matrix_adjacency(4,
+            0, 1, 1, 0,
+            0, 0, 1, 0,
+            1, 0, 0, 1,
+            1, 0, 0, 0);
+
+    graph_warshalls_algorithm(adjacency_matrix, 4, graph_print_linked_path);
+    printf("\n");
+    return 1;
+}
+#endif
+
 void test_graph(){
+#ifdef GRAPH_ENABLE_TEST_FLOYD_WARSHALL
+    tst_suite_start("Graph", 5);
+#else
     tst_suite_start("Graph", 3);
+#endif
     TEST("Breadth First Search", test_bfs());
     TEST("Depth First Search", test_dfs());
     TEST("Dijkstra's Shortest Path", test_dijkstra());
+#ifdef GRAPH_ENABLE_TEST_FLOYD_WARSHALL
+    TEST("Flyod's Algorithm", test_floyd());
+    TEST("Warshall's Algorithm", test_warshalls());
+#endif
     tst_suite_end();
 }
