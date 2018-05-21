@@ -11,6 +11,7 @@
 
 static i64 *dataset = NULL;
 static siz size = 0;
+static volatile sig_atomic_t sig_in_progress = 0;
 
 void dump_set(i64 *arr, siz s){
     if(dataset != NULL)
@@ -103,8 +104,13 @@ static void dump_data_auto(){
     dump_data_append("crashdump");
 }
 
-static void dump_handler(int signal){
-    switch(signal){
+static void dump_handler(int sig){
+    if(sig_in_progress)
+        raise(sig);
+
+    sig_in_progress = 1;
+    
+    switch(sig){
         case SIGSEGV:
             err("Caught SIGSEGV! Dumping data!");
             break;
@@ -114,6 +120,9 @@ static void dump_handler(int signal){
     }
     if(size > 0)
         dump_data_auto();
+    printf("\n");
+    signal(sig, SIG_DFL);
+    raise(sig);
 }
 
 static void dump_free(){
