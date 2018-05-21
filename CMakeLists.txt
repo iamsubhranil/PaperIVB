@@ -43,6 +43,12 @@ target_link_libraries(avl   test
                             display
                             utils)
 
+add_library(graph SHARED graph.c)
+target_link_libraries(graph queue
+                            stack
+                            display
+                            test)
+
 add_library(ht SHARED hashtable.c)
 target_link_libraries(ht    test
                             utils)
@@ -55,6 +61,7 @@ target_link_libraries(paperivb  array
                                 queue
                                 ht
                                 avl
-                                dump)
+                                dump
+                                graph)
 
 add_definitions(-DSORT_ENABLE_TEST_ALL -DSORT_TEST_ITEM_COUNT=50000 -DBST_TEST_ITEM_COUNT=50000 -DAVL_TEST_ITEM_COUNT=50000)

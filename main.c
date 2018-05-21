@@ -8,6 +8,7 @@
 #include "hashtable.h"
 #include "avl.h"
 #include "dump.h"
+#include "graph.h"
 
 int main(){
     dump_init();
@@ -18,5 +19,6 @@ int main(){
     test_bst();
     test_hashtable();
     test_avl();
+    test_graph();
     printf("\n");
 }
