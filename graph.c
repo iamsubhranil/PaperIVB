@@ -371,6 +371,13 @@ i64 graph_krushkals_mst(i64 **length_matrix, siz vertices, graph_process_edge pr
 static siz graph_visited_vertices[8] = {0};
 static siz graph_visited_vertices_pointer = 0;
 
+static void graph_free_2d(void **matrix, siz length){
+    for(siz i = 0;i < length;i++){
+        free(matrix[i]);
+    }
+    free(matrix);
+}
+
 static void graph_visit_vertex(siz v){
     graph_visited_vertices[graph_visited_vertices_pointer++] = v;
     //dbg("[BFS] Processed %" Psiz, v);
@@ -396,6 +403,7 @@ static u8 test_bfs(){
             0, 0, 0, 1, 0, 0, 0, 1,
             0, 0, 0, 0, 1, 0, 1, 0);
     graph_bfs(adjacency_matrix, 8, 3, graph_visit_vertex);
+    graph_free_2d((void**)adjacency_matrix, 8);
     siz expected[] = {3, 4, 5, 1, 6, 7, 2, 8};
     for(siz i = 0;i < 8;i++){
         if(expected[i] != graph_visited_vertices[i])
@@ -430,6 +438,7 @@ static u8 test_dfs(){
 
     graph_visited_vertices_pointer = 0;
     graph_dfs(adjacency, 8, 1, graph_visit_vertex);
+    graph_free_2d((void**)adjacency, 8);
     siz expected [] =  {1, 2, 3, 4, 7, 8, 5, 6};
     for(siz i = 0;i < 8;i++){
         if(graph_visited_vertices[i] != expected[i])
@@ -473,6 +482,7 @@ static u8 test_dijkstra(){
 
     graph_visited_vertices_pointer = 0;
     i64 dist = graph_dijkstras_shortest_path(length_matrix, 7, 1, 7, graph_store_path);
+    graph_free_2d((void**)length_matrix, 7);
     if(dist != 7)
         return 0;
     siz expected_path[] = {1, 2, 4, 5, 7};
@@ -501,6 +511,7 @@ static u8 test_floyd(){
             INT_MAX, INT_MAX, INT_MAX, 0);
 
     graph_floyds_algorithm(length_matrix, 4, graph_print_linked_path_with_length);
+    graph_free_2d((void**)length_matrix, 4);
     printf("\n");
     return 1;
 }
@@ -523,6 +534,7 @@ static u8 test_warshalls(){
             1, 0, 0, 0);
 
     graph_warshalls_algorithm(adjacency_matrix, 4, graph_print_linked_path);
+    graph_free_2d((void**)adjacency_matrix, 4);
     printf("\n");
     return 1;
 }
@@ -555,6 +567,7 @@ static u8 test_prims(){
             6, 8, INT_MAX, 0, 9,
             INT_MAX, 5, 7, 9, 0);
     i64 cost = graph_prims_mst(length_matrix, 5, graph_store_edge);
+    graph_free_2d((void**)length_matrix, 5);
     siz chosen_edges[4][2] = {{1, 2}, {2, 3}, {2, 5}, {1, 4}};
     for(siz i = 0;i < 4;i++){
         if(graph_stored_edges[i][0] != chosen_edges[i][0]
@@ -586,6 +599,7 @@ static u8 test_krushkals(){
 
     graph_stored_edge_pointer = 0;
     i64 cost = graph_krushkals_mst(length_matrix, 5, graph_store_edge);
+    graph_free_2d((void**)length_matrix, 5);
     siz chosen_edges[4][2] = {{1, 2}, {2, 3}, {2, 5}, {1, 4}};
     for(siz i = 0;i < 4;i++){
         if(graph_stored_edges[i][0] != chosen_edges[i][0]
