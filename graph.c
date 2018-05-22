@@ -289,6 +289,85 @@ void graph_warshalls_algorithm(u8 **adjacency_matrix, siz vertices, graph_proces
     }
 }
 
+i64 graph_prims_mst(i64 **length_matrix, siz vertices, graph_process_edge process){
+    for(siz i = 0;i < vertices;i++){
+        for(siz j = 0;j < vertices;j++){
+            if(length_matrix[i][j] == 0)
+                length_matrix[i][j] = i64_MAX;
+        }
+    }
+    
+    u8 status[vertices];
+    for(siz i = 0;i < vertices;i++)
+        status[i] = 0;
+    status[0] = 1;
+
+    siz number_of_edges = 0;
+    i64 cost = 0;
+
+    while(number_of_edges < vertices - 1){
+        i64 min = i64_MAX;
+        siz su, sv;
+        for(siz u = 0;u < vertices;u++){
+            if(status[u] == 1){
+                for(siz v = 0;v < vertices;v++){
+                    if(status[v] == 0 && length_matrix[u][v] < min){
+                        min = length_matrix[u][v];
+                        su = u;
+                        sv = v;
+                    }
+                }
+            }
+        }
+        process(su + 1, sv + 1);
+        status[sv] = 1;
+        length_matrix[su][sv] = i64_MAX;
+        length_matrix[sv][su] = i64_MAX;
+        number_of_edges++;
+        cost += min;
+    }
+    return cost;
+}
+
+static siz root_of(siz parent[], siz vertex){
+    while(parent[vertex] != 0)
+        vertex = parent[vertex];
+    return vertex;
+}
+
+i64 graph_krushkals_mst(i64 **length_matrix, siz vertices, graph_process_edge process){
+    siz parent[vertices];
+    for(siz i = 0;i < vertices;i++)
+        parent[i] = 0;
+
+    siz number_of_edges = 0;
+    i64 cost = 0;
+    while(number_of_edges < vertices - 1){
+        i64 min = i64_MAX;
+        siz u, v;
+        for(siz i = 0;i < vertices;i++){
+            for(siz j = 0;j < vertices;j++){
+                if(i != j && length_matrix[i][j] < min){
+                    min = length_matrix[i][j];
+                    u = i;
+                    v = j;
+                }
+            }
+        }
+        siz ru = root_of(parent, u);
+        siz rv = root_of(parent, v);
+        if(ru != rv){
+            number_of_edges++;
+            process(u + 1, v + 1);
+            parent[rv] = ru;
+            cost += length_matrix[u][v];
+        }
+        length_matrix[u][v] = i64_MAX;
+        length_matrix[v][u] = i64_MAX;
+    }
+    return cost;
+}
+
 static siz graph_visited_vertices[8] = {0};
 static siz graph_visited_vertices_pointer = 0;
 
@@ -449,11 +528,80 @@ static u8 test_warshalls(){
 }
 #endif
 
+static siz graph_stored_edges[4][2] = {{0}};
+static siz graph_stored_edge_pointer = 0;
+
+static void graph_store_edge(siz u, siz v){
+    graph_stored_edges[graph_stored_edge_pointer][0] = u;
+    graph_stored_edges[graph_stored_edge_pointer][1] = v;
+    graph_stored_edge_pointer++;
+}
+
+static u8 test_prims(){
+    /* 
+     *     2    3
+     * (1)--(2)--(3)
+     *  |   / \   |
+     * 6| 8/   \5 |7
+     *  | /     \ |
+     * (4)-------(5)
+     *      9          
+     */
+    
+    i64 **length_matrix = graph_create_matrix_length(5,
+            0, 2, INT_MAX, 6, INT_MAX,
+            2, 0, 3, 8, 5,
+            INT_MAX, 3, 0, INT_MAX, 7,
+            6, 8, INT_MAX, 0, 9,
+            INT_MAX, 5, 7, 9, 0);
+    i64 cost = graph_prims_mst(length_matrix, 5, graph_store_edge);
+    siz chosen_edges[4][2] = {{1, 2}, {2, 3}, {2, 5}, {1, 4}};
+    for(siz i = 0;i < 4;i++){
+        if(graph_stored_edges[i][0] != chosen_edges[i][0]
+                || graph_stored_edges[i][1] != chosen_edges[i][1])
+            return 0;
+    }
+    if(cost != 16)
+        return 0;
+    return 1;
+}
+
+static u8 test_krushkals(){
+    /* 
+     *     2    3
+     * (1)--(2)--(3)
+     *  |   / \   |
+     * 6| 8/   \5 |7
+     *  | /     \ |
+     * (4)-------(5)
+     *      9          
+     */
+    
+    i64 **length_matrix = graph_create_matrix_length(5,
+            0, 2, INT_MAX, 6, INT_MAX,
+            2, 0, 3, 8, 5,
+            INT_MAX, 3, 0, INT_MAX, 7,
+            6, 8, INT_MAX, 0, 9,
+            INT_MAX, 5, 7, 9, 0);
+
+    graph_stored_edge_pointer = 0;
+    i64 cost = graph_krushkals_mst(length_matrix, 5, graph_store_edge);
+    siz chosen_edges[4][2] = {{1, 2}, {2, 3}, {2, 5}, {1, 4}};
+    for(siz i = 0;i < 4;i++){
+        if(graph_stored_edges[i][0] != chosen_edges[i][0]
+                || graph_stored_edges[i][1] != chosen_edges[i][1])
+            return 0;
+    }
+    if(cost != 16)
+        return 0;
+    return 1;
+}
+
 void test_graph(){
 #ifdef GRAPH_ENABLE_TEST_FLOYD_WARSHALL
-    tst_suite_start("Graph", 5);
+    tst_suite_start("Graph", 7);
 #else
-    tst_suite_start("Graph", 3);
+    tst_suite_start("Graph", 5);
 #endif
     TEST("Breadth First Search", test_bfs());
     TEST("Depth First Search", test_dfs());
@@ -462,5 +610,7 @@ void test_graph(){
     TEST("Flyod's Algorithm", test_floyd());
     TEST("Warshall's Algorithm", test_warshalls());
 #endif
+    TEST("Prim's Minimal Spanning Tree", test_prims());
+    TEST("Krushkal's Minimal Spanning Tree", test_krushkals());
     tst_suite_end();
 }
