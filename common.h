@@ -55,3 +55,9 @@ typedef uint8_t u8;
 typedef size_t siz;
 #define Psiz "zd"
 #define Ssiz "zd"
+
+#define STACKTRACE_SHOW
+
+#ifdef __ANDROID__ // no execinfo.h
+#undef STACKTRACE_SHOW
+#endif

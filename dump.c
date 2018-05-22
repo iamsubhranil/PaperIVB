@@ -4,13 +4,14 @@
 #include <time.h>
 #include <unistd.h>
 #include <signal.h>
-#ifdef __linux
-#include <execinfo.h>
-#endif
 
 #include "dump.h"
 #include "display.h"
 #include "common.h"
+
+#ifdef STACKTRACE_SHOW
+#include <execinfo.h>
+#endif
 
 static i64 *dataset = NULL;
 static siz size = 0;
@@ -114,7 +115,7 @@ static void dump_free(){
 
 // From https://spin.atomicobject.com/2013/01/13/exceptions-stack-traces-c/
 
-#ifdef __linux__
+#ifdef STACKTRACE_SHOW
 
 typedef struct{
     char *name, *offset, *address;
@@ -281,7 +282,7 @@ static void posix_signal_handler(int sig, siginfo_t *siginfo, void *context){
             break;
     }
     printf("\n");
-#ifdef __linux__
+#ifdef STACKTRACE_SHOW
     posix_print_stack_trace();
 #else
     warn("Stacktrace is not currently available for this platform!");
