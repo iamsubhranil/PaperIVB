@@ -24,6 +24,9 @@ void graph_bfs(u8 **adjacency_matrix, siz vertices, siz vstart, graph_process_ve
 void graph_dfs(u8 **adjacency_matrix, siz vertices, siz vstart, graph_process_vertex process);
 i64 graph_dijkstras_shortest_path(i64 **length_matrix, siz vertices, siz vsource, siz vdest, graph_process_path process);
 void graph_floyds_algorithm(i64 **length_matrix, siz vertices, graph_process_linked_path_with_length process);
+void graph_warshalls_algorithm(u8 **adjacency_matrix, siz vertices, graph_process_linked_path process);
+i64 graph_prims_mst(i64 **length_matrix, siz vertices, graph_process_edge process);
+i64 graph_krushkals_mst(i64 **length_matrix, siz vertices, graph_process_edge process);
 
 // Utility Methods
 void graph_print_path(siz prev[], siz vsource, siz vdest);
