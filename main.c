@@ -9,6 +9,7 @@
 #include "avl.h"
 #include "dump.h"
 #include "graph.h"
+#include "numerical.h"
 
 int main(){
     dump_init();
@@ -20,5 +21,6 @@ int main(){
     test_hashtable();
     test_avl();
     test_graph();
+    test_numericals();
     printf("\n");
 }

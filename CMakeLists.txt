@@ -53,6 +53,10 @@ add_library(ht SHARED hashtable.c)
 target_link_libraries(ht    test
                             utils)
 
+add_library(numerical SHARED numerical.c)
+target_link_libraries(numerical test
+                                m)
+
 add_executable(paperivb main.c)
 target_link_libraries(paperivb  array
                                 stack
@@ -62,6 +66,7 @@ target_link_libraries(paperivb  array
                                 ht
                                 avl
                                 dump
-                                graph)
+                                graph
+                                numerical)
 
 add_definitions(-DSORT_ENABLE_TEST_ALL -DSORT_TEST_ITEM_COUNT=50000 -DBST_TEST_ITEM_COUNT=50000 -DAVL_TEST_ITEM_COUNT=50000)
