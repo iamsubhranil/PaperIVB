@@ -125,6 +125,32 @@ double numerical_regula_falsi(numerical_fx fx, double a, double b, double epsilo
         return NAN;
 }
 
+double* numerical_gauss_elimination(double **pivotted_matrix, siz num_coeff){
+    for(siz i = 1;i < num_coeff;i++){
+        for(siz j = 0; j < i;j++){
+            double item_to_be_zeroed = pivotted_matrix[i][j];
+            double multiplier = - (item_to_be_zeroed / pivotted_matrix[j][j]);
+            for(siz k = 0;k < num_coeff + 1;k++){
+                pivotted_matrix[i][k] += (multiplier * pivotted_matrix[j][k]);
+            }
+        }
+    }
+    double *solution = (double *)malloc(sizeof(double) * num_coeff);
+    for(siz i = num_coeff - 1;i >= 0;i--){
+        double additional;
+        for(siz j = num_coeff;j > i;j--){
+            if(j == num_coeff)
+                additional = pivotted_matrix[i][j];
+            else
+                additional -= solution[j]*pivotted_matrix[i][j];
+        }
+        solution[i] = additional/pivotted_matrix[i][i];
+        if(i == 0)
+            break;
+    }
+    return solution;
+}
+
 /* x0 = 0, y0 = 1
  * xn = 1, h = 0.1
  * expected yn = 1.0715783953
@@ -250,13 +276,58 @@ static u8 test_newton_raphson(){
     return 1;
 }
 
+static double **create_matrix_2d(siz n, siz m, ...){
+    double **mat = (double **)malloc(sizeof(double *) * n);
+    for(siz i = 0;i < n;i++)
+        mat[i] = (double *)malloc(sizeof(double) * m);
+
+    va_list vals;
+    va_start(vals, m);
+
+    for(siz i = 0;i < n;i++){
+        for(siz j = 0;j < m;j++){
+            mat[i][j] = va_arg(vals, double);
+        }
+    }
+
+    va_end(vals);
+
+    return mat;
+}
+
+static void free_matrix_2d(double **mat, siz n){
+    for(siz i = 0;i < n;i++)
+        free(mat[i]);
+    free(mat);
+}
+
+static u8 test_gauss_elimination(){
+    double **coeff = create_matrix_2d(3, 4,
+            20.0, 15.0, 12.0, 6.0,
+            6.0, 4.0, 3.0, 0.0,
+            6.0, 3.0, 2.0, 6.0);
+    double *solution = numerical_gauss_elimination(coeff, 3);
+    double expected[] = {12, -54, 48};
+    u8 ret = 1;
+    for(siz i = 0;i < 3;i++){
+        if(dne(solution[i], expected[i])){
+            ret = 0;
+            break;
+        }
+    }
+    free(solution);
+    free_matrix_2d(coeff, 3);
+    return ret;
+}
+
 void test_numericals(){
-    tst_suite_start("Numerical Analysis", 6);
+    tst_suite_start("Numerical Analysis", 7);
     TEST("Runge-Kutta 4th Order", test_rk4th());
     TEST("Simpson's 1/3rd Rule", test_simpsons());
     TEST("Trapezoidal's Rule", test_trapezoidals());
     TEST("Bisection Method", test_bisection());
     TEST("Regula Falsi Method", test_regula_falsi());
     TEST("Newton Raphson Method", test_newton_raphson());
+    TEST("Gauss Elimination Method", test_gauss_elimination());
     tst_suite_end();
 }

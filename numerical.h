@@ -11,5 +11,6 @@ double numerical_trapezoidals(numerical_fx fx, double x0, double xn, double h);
 double numerical_bisection(numerical_fx fx, double a, double b, double epsilon, i64 maxit);
 double numerical_newton_raphson(numerical_fx fx, numerical_fx fdx, double initial, double epsilon, i64 maxit);
 double numerical_regula_falsi(numerical_fx fx, double a, double b, double epsilon, i64 maxit);
+double* numerical_gauss_elimination(double **pivotted_matrix, siz num_coeff);
 
 void test_numericals();
