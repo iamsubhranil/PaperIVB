@@ -136,9 +136,10 @@ static ProgramInfo get_program_info(const char *address){
     while(address[i] != ')')
         i++;
     char *offset = (char *)malloc(i - bak + 2);
-    for(siz tmp = bak, idx = 0;tmp < i;tmp++, idx++)
+    siz idx = 0;
+    for(siz tmp = bak;tmp < i;tmp++, idx++)
         offset[idx] = address[tmp];
-    offset[i - bak + 1] = '\0';
+    offset[idx] = '\0';
     p.offset = offset;
     return p;
 }
