@@ -68,7 +68,7 @@ void histo_draw(i64 *arr, siz n, i64 colorCount, ...){
                 if(colorCount > 0){
                     for(i64 k = 0;k < colorCount;k++){
                         if(colors[k].index == j){
-                            printf(colors[k].color);
+                            printf("%s", colors[k].color);
                             printf("    \u2584" ANSI_COLOR_RESET);
                             goto colorend;
                         }
