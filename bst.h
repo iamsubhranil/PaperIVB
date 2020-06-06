@@ -2,20 +2,16 @@
 
 #include "common.h"
 
-#ifndef BST_TEST_ITEM_COUNT
-#define BST_TEST_ITEM_COUNT 10000
-#endif
-
-typedef struct BST{
-    i64 value;
-    struct BST *left;
-    struct BST *right;
+typedef struct BST {
+	i64         value;
+	struct BST *left;
+	struct BST *right;
 } BST;
 
-typedef struct BST* BinarySearchTree;
+typedef struct BST *BinarySearchTree;
 
 BinarySearchTree bst_create(i64 *arr, siz n);
-void bst_free(BinarySearchTree bst);
+void             bst_free(BinarySearchTree bst);
 
 u8 bst_insert(BinarySearchTree bst, i64 value);
 
@@ -24,7 +20,7 @@ u8 bst_search(BinarySearchTree bst, i64 value);
 // Root can also be modified
 u8 bst_delete(BinarySearchTree *bst, i64 value);
 
-typedef void(*bst_process)(i64);
+typedef void (*bst_process)(i64);
 
 void bst_preorder(BinarySearchTree bst, bst_process process);
 void bst_preorder_nonrec(BinarySearchTree bst, bst_process process);

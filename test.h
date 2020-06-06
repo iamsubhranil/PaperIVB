@@ -36,7 +36,7 @@ void tst_pause(const char *reason);
 
 // Resumes a paused test. This method restarts any
 // timers that was previously paused, if and only
-// if they were paused before. 
+// if they were paused before.
 // The `status` argument is optional, to notify
 // the user about the state of the test after
 // resume. This method can also be used just to
@@ -48,8 +48,10 @@ void tst_resume(const char *status);
 // a zero to denote failure
 
 #define TEST(name, method) \
-    tst_start(name); \
-    if(method) \
-        tst_pass(); \
-    else \
-        tst_fail();
+	{                      \
+		tst_start(name);   \
+		if(method)         \
+			tst_pass();    \
+		else               \
+			tst_fail();    \
+	}

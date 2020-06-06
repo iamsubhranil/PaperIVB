@@ -1,8 +1,9 @@
 #pragma once
 
+#include <inttypes.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <inttypes.h>
 
 typedef int64_t i64;
 #define Pi64 PRId64
@@ -61,3 +62,99 @@ typedef size_t siz;
 #ifdef __ANDROID__ // no execinfo.h
 #undef STACKTRACE_SHOW
 #endif
+
+// macros
+#ifndef ARRAY_TEST_ITEM_COUNT
+#define ARRAY_TEST_ITEM_COUNT 10000
+#endif
+
+#ifndef AVL_TEST_ITEM_COUNT
+#define AVL_TEST_ITEM_COUNT 10000
+#endif
+
+#ifndef BST_TEST_ITEM_COUNT
+#define BST_TEST_ITEM_COUNT 10000
+#endif
+
+#ifndef HASHTABLE_TEST_ITEM_COUNT
+#define HASHTABLE_TEST_ITEM_COUNT 10000
+#endif
+
+#ifndef QUEUE_TEST_ITEM_COUNT
+#define QUEUE_TEST_ITEM_COUNT 10000
+#endif
+
+#ifdef QUEUE_ENABLE_FAST         // Enable fixed-front queue (queue_fast.c)
+#elif defined(QUEUE_ENABLE_LINK) // Enable linked queue (queue_linked.c)
+#else
+#ifndef QUEUE_ENABLE_CIRCULAR // Default circular queue (queue.c)
+#define QUEUE_ENABLE_CIRCULAR
+#endif
+#endif
+
+#ifndef SORT_TEST_ITEM_COUNT // Don't redefine sample count if it is specified
+                             // at cmd
+#define SORT_TEST_ITEM_COUNT \
+	10000 // denotes the number of samples in each sort test
+#endif
+
+//#define SORT_ENABLE_VISUAL // toggles the visualization of all algorithms
+
+#ifndef STACK_TEST_ITEM_COUNT
+#define STACK_TEST_ITEM_COUNT 10000
+#endif
+
+typedef struct {
+	union {
+		struct {
+			i64 arr_test_item_count;
+			i64 avl_test_item_count;
+			i64 bst_test_item_count;
+			i64 graph_test_item_count; // unused
+			i64 hashtable_test_item_count;
+			i64 numerical_test_item_count; // unused
+			i64 queue_test_item_count;
+			i64 sort_test_item_count;
+			i64 stack_test_item_count;
+		};
+		i64 counts[9];
+	};
+	union {
+		struct {
+			bool arr_test;
+			bool avl_test;
+			bool bst_test;
+			bool graph_test;
+			bool hashtable_test;
+			bool numerical_test;
+			bool queue_test;
+			bool sort_test;
+			bool stack_test;
+		};
+		bool tests[9];
+	};
+	bool graph_test_floyd_warshall;
+	union {
+		struct {
+			bool sort_test_bubble;
+			bool sort_test_bubble_rec;
+			bool sort_test_bubble_adv;
+			bool sort_test_heap;
+			bool sort_test_insertion;
+			bool sort_test_insertion_rec;
+			bool sort_test_merge;
+			bool sort_test_merge_nonrec;
+			bool sort_test_quick;
+			bool sort_test_quick_nonrec;
+			bool sort_test_radix;
+			bool sort_test_selection;
+			bool sort_test_selection_rec;
+		};
+		bool sort_tests[13];
+	};
+#ifdef SORT_ENABLE_VISUAL
+	bool sort_enable_visual;
+#endif
+} Configuration;
+
+extern Configuration config;

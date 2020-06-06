@@ -3,3 +3,5 @@ build/*
 .gdb_history
 *.dump
 .lastdump
+.idea/*
+cmake-*

@@ -2,37 +2,13 @@
 
 #include "common.h"
 
-typedef enum{
-    SORT_TYPE_ASCENDING = 0,
-    SORT_TYPE_DESCENDING = 1
-} SortType;
-i64 check_sort(i64 *arr, siz n, SortType type); // Checks whether an array is sorted
+typedef enum { SORT_TYPE_ASCENDING = 0, SORT_TYPE_DESCENDING = 1 } SortType;
+i64 check_sort(i64 *arr, siz n,
+               SortType type); // Checks whether an array is sorted
 
-#ifndef SORT_TEST_ITEM_COUNT // Don't redefine sample count if it is specified at cmd
-#define SORT_TEST_ITEM_COUNT 10000 // denotes the number of samples in each sort test
-#endif
-
-//#define SORT_ENABLE_VISUAL // toggles the visualization of all algorithms
-
-#ifdef SORT_ENABLE_TEST_ALL
-#define SORT_ENABLE_TEST_BUBBLE
-#define SORT_ENABLE_TEST_BUBBLE_REC
-#define SORT_ENABLE_TEST_BUBBLE_ADV
-#define SORT_ENABLE_TEST_SELECTION
-#define SORT_ENABLE_TEST_SELECTION_REC
-#define SORT_ENABLE_TEST_INSERTION
-#define SORT_ENABLE_TEST_INSERTION_REC
-#define SORT_ENABLE_TEST_QUICK
-#define SORT_ENABLE_TEST_QUICK_NONREC
-#define SORT_ENABLE_TEST_HEAP
-#define SORT_ENABLE_TEST_MERGE
-#define SORT_ENABLE_TEST_MERGE_NONREC
-#define SORT_ENABLE_TEST_RADIX
-#endif
-
-#define ADD_METHOD(x, ret) \
-    ret x(i64 *arr, siz count); \
-    i64 test_##x();
+#define ADD_METHOD(x, ret)      \
+	ret x(i64 *arr, siz count); \
+	i64 test_##x();
 
 ADD_METHOD(quick_sort, void)
 ADD_METHOD(quick_sort_nonrec, void)

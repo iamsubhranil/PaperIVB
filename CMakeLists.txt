@@ -1,3 +1,11 @@
+project(PaperIVB)
+
+cmake_minimum_required(VERSION 3.10)
+
+cmake_policy(SET CMP0003 NEW)
+
+add_library(cargparser SHARED CargParser/cargparser.c)
+
 add_library(display SHARED display.c)
 
 add_library(utils SHARED utils.c)
@@ -67,6 +75,7 @@ target_link_libraries(paperivb  array
                                 avl
                                 dump
                                 graph
-                                numerical)
+                                numerical
+                                cargparser)
 
 add_definitions(-DSORT_ENABLE_TEST_ALL -DSORT_TEST_ITEM_COUNT=50000 -DBST_TEST_ITEM_COUNT=50000 -DAVL_TEST_ITEM_COUNT=50000)

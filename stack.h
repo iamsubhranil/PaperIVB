@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-typedef struct Stack_Intr* Stack;
+typedef struct Stack_Intr *Stack;
 
 // `grow` indicates whether the stack is
 // permitted to grow dynamically at runtime.
@@ -34,20 +34,19 @@ void stack_push_bool(Stack stack, u8 value);
 
 // No underflow check, same cautions applicable
 // as stack_push_fast
-i64 stack_pop_fast(Stack stack);
-void* stack_pop_fast_generic(Stack stack);
-u8 stack_pop_fast_bool(Stack stack);
+i64   stack_pop_fast(Stack stack);
+void *stack_pop_fast_generic(Stack stack);
+u8    stack_pop_fast_bool(Stack stack);
 
 // Slower, safer pop, with full underflow check
-i64 stack_pop(Stack stack);
-void* stack_pop_generic(Stack stack);
-u8 stack_pop_bool(Stack stack);
-
+i64   stack_pop(Stack stack);
+void *stack_pop_generic(Stack stack);
+u8    stack_pop_bool(Stack stack);
 
 // Stack status query
-u8 stack_is_empty(Stack stack);
-u8 stack_is_overflow(Stack stack);
-u8 stack_is_underflow(Stack stack);
+u8  stack_is_empty(Stack stack);
+u8  stack_is_overflow(Stack stack);
+u8  stack_is_underflow(Stack stack);
 i64 stack_size(Stack stack);
 i64 stack_size_generic(Stack stack);
 i64 stack_size_bool(Stack stack);
