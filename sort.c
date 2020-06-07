@@ -6,6 +6,7 @@
 #include "queue.h"
 #include "stack.h"
 #include "test.h"
+#include <string.h>
 
 #ifdef SORT_ENABLE_VISUAL
 
@@ -499,26 +500,74 @@ void merge_sort_nonrec(i64 *arr, siz n) {
 
 sort_test(merge_sort_nonrec);
 
-static i64 *heap_create(i64 *arr, siz n) {
-	i64 *heap = arr_new(n);
-	for(siz i = 0; i < n; i++) {
-		heap[i] = arr[i];
-		siz j   = i;
-		while(j > 0) {
-			siz parent = (j + 1) / 2 - 1;
+// j is the position from where we should start sifting down
+// firstparent is the index of the parent which has the last child
+// heap is the array containing the heap
+// n is number of elements in heap
+
 #ifdef SORT_ENABLE_VISUAL
-			if(config.sort_enable_visual)
-				histo_draw(arr, n, 2, j, ANSI_COLOR_BLUE, parent,
-				           ANSI_COLOR_RED);
+static void heap_sift_down(i64 *heap, siz j, siz firstparent, siz n,
+                           siz total) {
+#else
+static void heap_sift_down(i64 *heap, siz j, siz firstparent, siz n) {
 #endif
-			// Min heap
-			if(heap[j] < heap[parent]) {
-				swap(heap[j], heap[parent]);
-				j = parent;
-				continue;
+	// we'll only go down until the firstparent,
+	// which has at least one child
+	while(j <= firstparent) {
+		siz leftChild = (j * 2) + 1,
+		    // if the leftChild is already n - 1,
+		    // we mark the rightChild to the same,
+		    // so that we can avoid rightChild < n
+		    // condition below
+		    rightChild = (j * 2) + 2;
+		siz min        = j;
+#ifdef SORT_ENABLE_VISUAL
+		if(config.sort_enable_visual) {
+			if(leftChild < n && rightChild < n) {
+				histo_draw(heap, total, 3, leftChild, ANSI_COLOR_BLUE, j,
+				           ANSI_COLOR_RED, rightChild, ANSI_COLOR_GREEN);
+			} else if(leftChild < n) {
+				histo_draw(heap, total, 2, leftChild, ANSI_COLOR_BLUE, j,
+				           ANSI_COLOR_RED);
+			} else if(rightChild < n) {
+				histo_draw(heap, total, 2, j, ANSI_COLOR_RED, rightChild,
+				           ANSI_COLOR_GREEN);
+			} else {
+				histo_draw(heap, total, 1, j, ANSI_COLOR_RED);
 			}
-			break;
 		}
+#endif
+		// the parent at least has the left child
+		if(heap[leftChild] < heap[min]) {
+			min = leftChild;
+		}
+		if(rightChild < n && heap[rightChild] < heap[min]) {
+			min = rightChild;
+		}
+		if(min != j) {
+			swap(heap[min], heap[j]);
+			j = min;
+		} else
+			break;
+	}
+}
+
+static i64 *heap_create(i64 *arr, siz n) {
+	i64 *heap        = arr_new(n);
+	siz  firstparent = n / 2 - 1;
+	// copy the nodes which either belong to
+	// the last level, or has no children
+	memcpy(&heap[firstparent + 1], &arr[firstparent + 1],
+	       sizeof(i64) * (n - firstparent - 1));
+	// start checking from the first parent
+	for(siz i = firstparent + 1; i > 0; i--) {
+		heap[i - 1] = arr[i - 1];
+		siz j       = i - 1;
+#ifdef SORT_ENABLE_VISUAL
+		heap_sift_down(heap, j, firstparent, n, n);
+#else
+		heap_sift_down(heap, j, firstparent, n);
+#endif
 	}
 	return heap;
 }
@@ -528,30 +577,15 @@ static void heap_rebuild(i64 *arr, siz n, siz total) {
 #else
 static void heap_rebuild(i64 *arr, siz n) {
 #endif
-	if(n == 1)
+	if(n < 2)
 		return;
-	siz j = 0;
-	while(1) {
-		siz leftChild = (j * 2) + 1, rightChild = (j * 2) + 2;
-		siz min = j;
+	siz firstparent = n / 2 - 1;
+	siz j           = 0;
 #ifdef SORT_ENABLE_VISUAL
-		if(config.sort_enable_visual)
-			histo_draw(arr, total, 3, leftChild, ANSI_COLOR_BLUE, j,
-			           ANSI_COLOR_RED, rightChild, ANSI_COLOR_GREEN);
+	heap_sift_down(arr, j, firstparent, n, total);
+#else
+	heap_sift_down(arr, j, firstparent, n);
 #endif
-		if(leftChild < n && arr[leftChild] < arr[min]) {
-			min = leftChild;
-		}
-		if(rightChild < n && arr[rightChild] < arr[min]) {
-			min = rightChild;
-		}
-		if(min != j) {
-			swap(arr[min], arr[j]);
-			j = min;
-			continue;
-		}
-		break;
-	}
 }
 
 void heap_sort(i64 *arr, siz n) {
